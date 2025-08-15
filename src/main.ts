@@ -6,6 +6,7 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppMinimalModule } from './app.minimal.module';
 
 async function bootstrap() {
@@ -33,6 +34,58 @@ async function bootstrap() {
         },
       }),
     );
+
+    // Swagger API Documentation
+    const swaggerConfig = new DocumentBuilder()
+      .setTitle('Executive Assistant AI')
+      .setDescription('AI-powered Executive Assistant automation platform with comprehensive API integrations')
+      .setVersion('2.0.0')
+      .setContact(
+        'Executive Assistant AI Team',
+        'https://github.com/your-org/executive-assistant-ai',
+        'support@yourcompany.com'
+      )
+      .addServer(`http://localhost:${port}`, 'Development Server')
+      .addApiKey(
+        {
+          type: 'apiKey',
+          name: 'X-API-Key',
+          in: 'header',
+          description: 'API key for authentication',
+        },
+        'ApiKeyAuth'
+      )
+      .addTag('Tasks', 'Task management and prioritization')
+      .addTag('Assistant', 'AI assistant and natural language processing')
+      .addTag('Calendar', 'Calendar integration and scheduling')
+      .addTag('Email', 'Email automation and templates')
+      .addTag('System', 'System health and configuration')
+      .build();
+
+    const document = SwaggerModule.createDocument(app, swaggerConfig, {
+      operationIdFactory: (controllerKey: string, methodKey: string) => methodKey,
+      deepScanRoutes: true,
+    });
+
+    SwaggerModule.setup('api/docs', app, document, {
+      customSiteTitle: 'Executive Assistant AI - API Documentation',
+      customfavIcon: '/favicon.ico',
+      customCss: `
+        .swagger-ui .topbar { display: none; }
+        .swagger-ui .info .title { color: #1976d2; }
+        .swagger-ui .scheme-container { background: #fafafa; padding: 15px; }
+      `,
+      swaggerOptions: {
+        persistAuthorization: true,
+        displayRequestDuration: true,
+        filter: true,
+        showExtensions: true,
+        showCommonExtensions: true,
+        docExpansion: 'none',
+        defaultModelsExpandDepth: 2,
+        defaultModelExpandDepth: 2,
+      },
+    });
 
     // CORS configuration
     app.enableCors({
@@ -63,6 +116,7 @@ async function bootstrap() {
     logger.log(`📋 Available endpoints:`);
     logger.log(`   • GET  /                     - Application info`);
     logger.log(`   • GET  /health               - Health check`);
+    logger.log(`   • GET  /api/docs             - API Documentation (Swagger)`);
     logger.log(`   • POST /api/assistant/process - Process AI requests`);
     logger.log(`   • GET  /api/calendar/events  - Get calendar events`);
     logger.log(`   • POST /api/email/send       - Send emails`);
