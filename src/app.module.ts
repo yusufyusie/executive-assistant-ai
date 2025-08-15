@@ -8,8 +8,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 
 // Configuration
-import configuration, { validateConfig } from './config/configuration';
-import dynamicConfiguration from './config/dynamic-configuration';
+import configuration from './config/configuration';
 
 // Presentation Layer Modules
 import { AssistantModule } from './modules/assistant/assistant.module';
@@ -28,7 +27,7 @@ import { AppService } from './app.service';
     ConfigModule.forRoot({
       isGlobal: true,
       cache: true,
-      load: [configuration, dynamicConfiguration],
+      load: [configuration],
       envFilePath: ['.env.local', '.env'],
     }),
 

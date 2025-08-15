@@ -18,7 +18,6 @@ import { TaskPrioritizationService } from '../../domain/services/task-prioritiza
 
 // Infrastructure Layer
 import { InMemoryTaskRepository } from '../../infrastructure/persistence/in-memory/task.repository.impl';
-import type { TaskRepository } from '../../domain/repositories/task.repository';
 
 @Module({
   controllers: [TaskController],
@@ -40,9 +39,10 @@ import type { TaskRepository } from '../../domain/repositories/task.repository';
     TaskPrioritizationService,
 
     // Repository Implementation
+    InMemoryTaskRepository,
     {
       provide: 'TaskRepository',
-      useClass: InMemoryTaskRepository,
+      useExisting: InMemoryTaskRepository,
     },
   ],
   exports: [TaskService, TaskApplicationService],

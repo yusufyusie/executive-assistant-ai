@@ -3,7 +3,7 @@
  * Handles task update commands
  */
 
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { CommandHandler } from '../../common/command.interface';
 import { Result, success, failure } from '../../common/result';
 import { UpdateTaskCommand } from './update-task.command';
@@ -13,7 +13,7 @@ import { Priority, TaskStatus, Email } from '../../../domain/common/value-object
 
 @Injectable()
 export class UpdateTaskHandler implements CommandHandler<UpdateTaskCommand, Result<TaskResponseDto, string>> {
-  constructor(private readonly taskRepository: TaskRepository) {}
+  constructor(@Inject('TaskRepository') private readonly taskRepository: TaskRepository) {}
 
   async handle(command: UpdateTaskCommand): Promise<Result<TaskResponseDto, string>> {
     try {

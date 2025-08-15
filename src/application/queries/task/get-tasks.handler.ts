@@ -3,7 +3,7 @@
  * Handles task retrieval queries
  */
 
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { QueryHandler } from '../../common/query.interface';
 import { Result, success, failure } from '../../common/result';
 import { GetTasksQuery } from './get-tasks.query';
@@ -13,7 +13,7 @@ import { Priority, TaskStatus } from '../../../domain/common/value-objects';
 
 @Injectable()
 export class GetTasksHandler implements QueryHandler<GetTasksQuery, Result<TaskListResponseDto, string>> {
-  constructor(private readonly taskRepository: TaskRepository) {}
+  constructor(@Inject('TaskRepository') private readonly taskRepository: TaskRepository) {}
 
   async handle(query: GetTasksQuery): Promise<Result<TaskListResponseDto, string>> {
     try {

@@ -208,7 +208,7 @@ export class AIAssistantService {
 
       try {
         switch (action.type) {
-          case 'create_task':
+          case 'create_task': {
             const taskResult = await this.taskService.createTask(action.parameters);
             if (taskResult.isSuccess) {
               assistantAction.status = 'executed';
@@ -218,20 +218,23 @@ export class AIAssistantService {
               assistantAction.error = taskResult.error;
             }
             break;
+          }
 
-          case 'schedule_meeting':
+          case 'schedule_meeting': {
             const meetingResult = await this.calendarService.createEvent(action.parameters);
             assistantAction.status = 'executed';
             assistantAction.result = meetingResult;
             break;
+          }
 
-          case 'send_email':
+          case 'send_email': {
             const emailResult = await this.emailService.sendEmail(action.parameters);
             assistantAction.status = 'executed';
             assistantAction.result = emailResult;
             break;
+          }
 
-          case 'prioritize_tasks':
+          case 'prioritize_tasks': {
             const prioritizeResult = await this.taskService.prioritizeTasks(action.parameters);
             if (prioritizeResult.isSuccess) {
               assistantAction.status = 'executed';
@@ -241,6 +244,7 @@ export class AIAssistantService {
               assistantAction.error = prioritizeResult.error;
             }
             break;
+          }
 
           default:
             assistantAction.status = 'failed';
