@@ -14,8 +14,8 @@
  * @author Executive Assistant AI Team
  */
 
-import { IsString, IsNumber, IsBoolean, IsOptional, IsEmail, IsUrl, IsEnum, Min, Max, validateSync } from 'class-validator';
-import { Transform, Type, plainToClass } from 'class-transformer';
+import { IsString, IsNumber, IsBoolean, IsOptional, IsEmail, IsUrl, IsEnum, Min, Max } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
 
 /**
  * Environment enumeration for type safety
@@ -305,91 +305,76 @@ export class AppConfig {
  * Configuration factory function
  */
 export const createConfiguration = (): AppConfig => {
-  const config = plainToClass(AppConfig, {
-    application: {
-      name: process.env.APP_NAME,
-      version: process.env.APP_VERSION,
-      environment: process.env.NODE_ENV,
-      port: process.env.PORT,
-      logLevel: process.env.LOG_LEVEL,
-      timezone: process.env.TIMEZONE,
-      enableMetrics: process.env.ENABLE_METRICS,
-      enableHealthChecks: process.env.ENABLE_HEALTH_CHECKS,
-    },
-    aiServices: {
-      geminiApiKey: process.env.GEMINI_API_KEY,
-      geminiModel: process.env.GEMINI_MODEL,
-      maxTokens: process.env.GEMINI_MAX_TOKENS,
-      temperature: process.env.GEMINI_TEMPERATURE,
-      requestsPerMinute: process.env.GEMINI_REQUESTS_PER_MINUTE,
-    },
-    googleServices: {
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      redirectUri: process.env.GOOGLE_REDIRECT_URI,
-      refreshToken: process.env.GOOGLE_REFRESH_TOKEN,
-      projectId: process.env.GCP_PROJECT_ID,
-      region: process.env.GCP_REGION,
-    },
-    emailServices: {
-      sendgridApiKey: process.env.SENDGRID_API_KEY,
-      fromEmail: process.env.SENDGRID_FROM_EMAIL,
-      fromName: process.env.SENDGRID_FROM_NAME,
-      dailyLimit: process.env.EMAIL_DAILY_LIMIT,
-      enableTemplates: process.env.ENABLE_EMAIL_TEMPLATES,
-    },
-    security: {
-      jwtSecret: process.env.JWT_SECRET,
-      apiKey: process.env.API_KEY,
-      jwtExpirationTime: process.env.JWT_EXPIRATION_TIME,
-      enableCors: process.env.ENABLE_CORS,
-      enableRateLimit: process.env.ENABLE_RATE_LIMIT,
-    },
-    performance: {
-      rateLimitMax: process.env.RATE_LIMIT_MAX,
-      rateLimitTtl: process.env.RATE_LIMIT_TTL,
-      cacheDefaultTtl: process.env.CACHE_DEFAULT_TTL,
-      enableCaching: process.env.ENABLE_CACHING,
-      enableCompression: process.env.ENABLE_COMPRESSION,
-    },
-    features: {
-      enableAIAssistant: process.env.FEATURE_AI_ASSISTANT,
-      enableCalendarIntegration: process.env.FEATURE_CALENDAR_INTEGRATION,
-      enableEmailAutomation: process.env.FEATURE_EMAIL_AUTOMATION,
-      enableTaskManagement: process.env.FEATURE_TASK_MANAGEMENT,
-      enableProactiveAutomation: process.env.FEATURE_PROACTIVE_AUTOMATION,
-      enableAnalytics: process.env.FEATURE_ANALYTICS,
-      enableAdvancedLogging: process.env.FEATURE_ADVANCED_LOGGING,
-    },
-  });
+  // Create configuration object with proper defaults
+  const config = new AppConfig();
 
-  // Validate configuration
-  const errors = validateSync(config, {
-    whitelist: true,
-    forbidNonWhitelisted: true,
-    transform: true,
-  });
+  // Set application config
+  config.application.name = process.env.APP_NAME || 'Executive Assistant AI';
+  config.application.version = process.env.APP_VERSION || '2.0.0';
+  config.application.environment = (process.env.NODE_ENV as Environment) || Environment.DEVELOPMENT;
+  config.application.port = parseInt(process.env.PORT || '3000', 10);
+  config.application.logLevel = (process.env.LOG_LEVEL as LogLevel) || LogLevel.INFO;
+  config.application.timezone = process.env.TIMEZONE || 'UTC';
+  config.application.enableMetrics = process.env.ENABLE_METRICS !== 'false';
+  config.application.enableHealthChecks = process.env.ENABLE_HEALTH_CHECKS !== 'false';
 
-  if (errors.length > 0) {
-    const errorMessages = errors.map(error =>
-      Object.values(error.constraints || {}).join(', ')
-    ).join('; ');
-    throw new Error(`Configuration validation failed: ${errorMessages}`);
-  }
+  // Set AI services config
+  config.aiServices.geminiApiKey = process.env.GEMINI_API_KEY || '';
+  config.aiServices.geminiModel = process.env.GEMINI_MODEL || 'gemini-2.0-flash-exp';
+  config.aiServices.maxTokens = parseInt(process.env.GEMINI_MAX_TOKENS || '1000', 10);
+  config.aiServices.temperature = parseFloat(process.env.GEMINI_TEMPERATURE || '0.7');
+  config.aiServices.requestsPerMinute = parseInt(process.env.GEMINI_REQUESTS_PER_MINUTE || '15', 10);
+
+  // Set Google services config
+  config.googleServices.clientId = process.env.GOOGLE_CLIENT_ID || '';
+  config.googleServices.clientSecret = process.env.GOOGLE_CLIENT_SECRET || '';
+  config.googleServices.redirectUri = process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3000/auth/google/callback';
+  config.googleServices.refreshToken = process.env.GOOGLE_REFRESH_TOKEN || '';
+  config.googleServices.projectId = process.env.GCP_PROJECT_ID || '';
+  config.googleServices.region = process.env.GCP_REGION || 'us-central1';
+
+  // Set email services config
+  config.emailServices.sendgridApiKey = process.env.SENDGRID_API_KEY || '';
+  config.emailServices.fromEmail = process.env.SENDGRID_FROM_EMAIL || 'assistant@example.com';
+  config.emailServices.fromName = process.env.SENDGRID_FROM_NAME || 'Executive Assistant AI';
+  config.emailServices.dailyLimit = parseInt(process.env.EMAIL_DAILY_LIMIT || '100', 10);
+  config.emailServices.enableTemplates = process.env.ENABLE_EMAIL_TEMPLATES !== 'false';
+
+  // Set security config
+  config.security.jwtSecret = process.env.JWT_SECRET || 'dev-secret-key';
+  config.security.apiKey = process.env.API_KEY || 'dev-api-key';
+  config.security.jwtExpirationTime = parseInt(process.env.JWT_EXPIRATION_TIME || '3600', 10);
+  config.security.enableCors = process.env.ENABLE_CORS !== 'false';
+  config.security.enableRateLimit = process.env.ENABLE_RATE_LIMIT !== 'false';
+
+  // Set performance config
+  config.performance.rateLimitMax = parseInt(process.env.RATE_LIMIT_MAX || '100', 10);
+  config.performance.rateLimitTtl = parseInt(process.env.RATE_LIMIT_TTL || '60000', 10);
+  config.performance.cacheDefaultTtl = parseInt(process.env.CACHE_DEFAULT_TTL || '300', 10);
+  config.performance.enableCaching = process.env.ENABLE_CACHING !== 'false';
+  config.performance.enableCompression = process.env.ENABLE_COMPRESSION !== 'false';
+
+  // Set feature flags
+  config.features.enableAIAssistant = process.env.FEATURE_AI_ASSISTANT !== 'false';
+  config.features.enableCalendarIntegration = process.env.FEATURE_CALENDAR_INTEGRATION !== 'false';
+  config.features.enableEmailAutomation = process.env.FEATURE_EMAIL_AUTOMATION !== 'false';
+  config.features.enableTaskManagement = process.env.FEATURE_TASK_MANAGEMENT !== 'false';
+  config.features.enableProactiveAutomation = process.env.FEATURE_PROACTIVE_AUTOMATION !== 'false';
+  config.features.enableAnalytics = process.env.FEATURE_ANALYTICS !== 'false';
+  config.features.enableAdvancedLogging = process.env.FEATURE_ADVANCED_LOGGING !== 'false';
 
   return config;
 };
 
 /**
- * Default configuration export
+ * Legacy configuration format for backward compatibility
  */
-export default createConfiguration;
-
-export default (): AppConfig => ({
+export const legacyConfiguration = (): any => ({
   app: {
     name: process.env.APP_NAME || 'Executive Assistant AI',
     port: parseInt(process.env.PORT || '3000', 10),
     environment: process.env.NODE_ENV || 'development',
+    version: process.env.APP_VERSION || '2.0.0',
   },
   gemini: {
     apiKey: process.env.GEMINI_API_KEY || '',
@@ -400,6 +385,7 @@ export default (): AppConfig => ({
     clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
     redirectUri: process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3000/auth/google/callback',
     refreshToken: process.env.GOOGLE_REFRESH_TOKEN || '',
+    projectId: process.env.GCP_PROJECT_ID || '',
   },
   sendgrid: {
     apiKey: process.env.SENDGRID_API_KEY || '',
@@ -412,7 +398,6 @@ export default (): AppConfig => ({
     schedulerTimezone: process.env.GCP_SCHEDULER_TIMEZONE || 'America/New_York',
   },
   application: {
-    defaultTimezone: process.env.DEFAULT_TIMEZONE || 'America/New_York',
     maxCalendarDaysAhead: parseInt(process.env.MAX_CALENDAR_DAYS_AHEAD || '90', 10),
     emailRateLimitPerHour: parseInt(process.env.EMAIL_RATE_LIMIT_PER_HOUR || '50', 10),
     taskReminderAdvanceHours: parseInt(process.env.TASK_REMINDER_ADVANCE_HOURS || '24', 10),
@@ -420,41 +405,65 @@ export default (): AppConfig => ({
   security: {
     jwtSecret: process.env.JWT_SECRET || 'dev-secret-key',
     apiKey: process.env.API_KEY || 'dev-api-key',
+    jwtExpirationTime: parseInt(process.env.JWT_EXPIRATION_TIME || '3600', 10),
+    enableCors: process.env.ENABLE_CORS !== 'false',
+    enableRateLimit: process.env.ENABLE_RATE_LIMIT !== 'false',
   },
   logging: {
     level: process.env.LOG_LEVEL || 'info',
     format: process.env.LOG_FORMAT || 'json',
   },
+  features: {
+    enableAIAssistant: process.env.FEATURE_AI_ASSISTANT !== 'false',
+    enableCalendarIntegration: process.env.FEATURE_CALENDAR_INTEGRATION !== 'false',
+    enableEmailAutomation: process.env.FEATURE_EMAIL_AUTOMATION !== 'false',
+    enableTaskManagement: process.env.FEATURE_TASK_MANAGEMENT !== 'false',
+    enableProactiveAutomation: process.env.FEATURE_PROACTIVE_AUTOMATION !== 'false',
+    enableAnalytics: process.env.FEATURE_ANALYTICS !== 'false',
+    enableAdvancedLogging: process.env.FEATURE_ADVANCED_LOGGING !== 'false',
+  },
+  performance: {
+    rateLimitMax: parseInt(process.env.RATE_LIMIT_MAX || '100', 10),
+    rateLimitTtl: parseInt(process.env.RATE_LIMIT_TTL || '60000', 10),
+    cacheDefaultTtl: parseInt(process.env.CACHE_DEFAULT_TTL || '300', 10),
+    enableCaching: process.env.ENABLE_CACHING !== 'false',
+    enableCompression: process.env.ENABLE_COMPRESSION !== 'false',
+  },
 });
 
+/**
+ * Default configuration export
+ */
+export default createConfiguration;
+
 // Configuration validation helper
-export const validateConfig = (config: AppConfig): string[] => {
+export const validateConfig = (config: any): string[] => {
   const errors: string[] = [];
 
   // Validate required API keys in production
-  if (config.app.environment === 'production') {
-    if (!config.gemini.apiKey) {
+  if (config.application?.environment === 'production') {
+    if (!config.aiServices?.geminiApiKey) {
       errors.push('GEMINI_API_KEY is required in production');
     }
-    if (!config.sendgrid.apiKey) {
+    if (!config.emailServices?.sendgridApiKey) {
       errors.push('SENDGRID_API_KEY is required in production');
     }
-    if (!config.google.clientId || !config.google.clientSecret) {
+    if (!config.googleServices?.clientId || !config.googleServices?.clientSecret) {
       errors.push('Google OAuth credentials are required in production');
     }
-    if (!config.security.jwtSecret) {
+    if (!config.security?.jwtSecret) {
       errors.push('JWT_SECRET is required in production');
     }
   }
 
   // Validate port range
-  if (config.app.port < 1 || config.app.port > 65535) {
+  if (config.application?.port && (config.application.port < 1 || config.application.port > 65535)) {
     errors.push('PORT must be between 1 and 65535');
   }
 
   // Validate email format
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (config.sendgrid.fromEmail && !emailRegex.test(config.sendgrid.fromEmail)) {
+  if (config.emailServices?.fromEmail && !emailRegex.test(config.emailServices.fromEmail)) {
     errors.push('SENDGRID_FROM_EMAIL must be a valid email address');
   }
 
