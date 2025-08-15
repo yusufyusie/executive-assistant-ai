@@ -5,7 +5,7 @@
 
 import { Controller, Get, Query, Res, Logger } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
-import { Response } from 'express';
+import type { Response } from 'express';
 import { GoogleOAuthService } from '../../../infrastructure/external-services/google-oauth/google-oauth.service';
 
 @ApiTags('Authentication')

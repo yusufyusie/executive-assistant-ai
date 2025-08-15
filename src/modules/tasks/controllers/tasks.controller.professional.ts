@@ -198,17 +198,14 @@ export class TasksControllerProfessional {
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
     description: 'Invalid query parameters',
-    type: ValidationErrorResponse,
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
     description: 'Authentication required',
-    type: ApiErrorResponse,
   })
   @ApiResponse({
     status: HttpStatus.TOO_MANY_REQUESTS,
     description: 'Rate limit exceeded',
-    type: ApiErrorResponse,
   })
   async getTasks(@Query() query: TaskQueryDto): Promise<ApiSuccessResponse<TaskListResponseDto>> {
     // Implementation would go here
@@ -264,12 +261,12 @@ export class TasksControllerProfessional {
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
     description: 'Task not found',
-    type: ApiErrorResponse,
+
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
     description: 'Invalid task ID format',
-    type: ApiErrorResponse,
+
   })
   async getTaskById(
     @Param('id', ParseUUIDPipe) id: string,
@@ -333,12 +330,12 @@ export class TasksControllerProfessional {
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
     description: 'Invalid task data',
-    type: ValidationErrorResponse,
+
   })
   @ApiResponse({
     status: HttpStatus.CONFLICT,
     description: 'Task with similar title already exists',
-    type: ApiErrorResponse,
+
   })
   async createTask(
     @Body() createTaskDto: CreateTaskDto,
@@ -408,12 +405,12 @@ export class TasksControllerProfessional {
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
     description: 'Task not found',
-    type: ApiErrorResponse,
+
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
     description: 'Invalid update data',
-    type: ValidationErrorResponse,
+
   })
   async updateTask(
     @Param('id', ParseUUIDPipe) id: string,
@@ -448,7 +445,7 @@ export class TasksControllerProfessional {
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
     description: 'Task not found',
-    type: ApiErrorResponse,
+
   })
   async deleteTask(
     @Param('id', ParseUUIDPipe) id: string,
@@ -504,7 +501,7 @@ export class TasksControllerProfessional {
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
     description: 'Invalid prioritization request',
-    type: ValidationErrorResponse,
+
   })
   async prioritizeTasks(
     @Body() prioritizeDto: PrioritizeTasksDto,
