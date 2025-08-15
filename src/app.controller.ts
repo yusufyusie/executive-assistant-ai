@@ -1,3 +1,8 @@
+/**
+ * Application Controller
+ * Main controller for application-level endpoints
+ */
+
 import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
 
@@ -6,7 +11,7 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  getApiInfo(): any {
+  getApplicationInfo(): any {
     return this.appService.getApiInfo();
   }
 
@@ -18,5 +23,10 @@ export class AppController {
   @Get('features')
   getFeatures(): any {
     return this.appService.getFeatures();
+  }
+
+  @Get('metrics')
+  getMetrics(): any {
+    return this.appService.getMetrics();
   }
 }

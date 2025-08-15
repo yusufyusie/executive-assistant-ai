@@ -135,4 +135,37 @@ export class AppService {
       },
     };
   }
+
+  getMetrics(): any {
+    const memoryUsage = process.memoryUsage();
+    const cpuUsage = process.cpuUsage();
+
+    return {
+      application: {
+        name: 'Executive Assistant AI',
+        version: '2.0.0',
+        uptime: process.uptime(),
+        environment: this.configService.get<string>('NODE_ENV', 'development'),
+      },
+      system: {
+        memory: {
+          used: Math.round(memoryUsage.heapUsed / 1024 / 1024),
+          total: Math.round(memoryUsage.heapTotal / 1024 / 1024),
+          external: Math.round(memoryUsage.external / 1024 / 1024),
+          unit: 'MB',
+        },
+        cpu: {
+          user: cpuUsage.user,
+          system: cpuUsage.system,
+        },
+        process: {
+          pid: process.pid,
+          platform: process.platform,
+          arch: process.arch,
+          nodeVersion: process.version,
+        },
+      },
+      timestamp: new Date().toISOString(),
+    };
+  }
 }
