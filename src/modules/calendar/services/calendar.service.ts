@@ -42,18 +42,22 @@ export class CalendarService {
 
   async intelligentSchedule(request: any): Promise<any> {
     try {
-      const suggestions = [];
+      const suggestions: Array<{
+        date: string;
+        slots: any[];
+        score: number;
+      }> = [];
       const today = new Date();
-      
+
       for (let i = 1; i <= 7; i++) {
         const checkDate = new Date(today);
         checkDate.setDate(checkDate.getDate() + i);
-        
+
         const availability = await this.checkAvailability(
-          checkDate.toISOString().split('T')[0], 
+          checkDate.toISOString().split('T')[0],
           request.duration || 60
         );
-        
+
         if (availability.availableSlots.length > 0) {
           suggestions.push({
             date: checkDate.toISOString().split('T')[0],
@@ -62,7 +66,7 @@ export class CalendarService {
           });
         }
       }
-      
+
       suggestions.sort((a, b) => b.score - a.score);
       
       return {
@@ -88,7 +92,11 @@ export class CalendarService {
 
   private calculateAvailability(events: any[], date: string, duration: number): any {
     const workingHours = { start: 9, end: 17 };
-    const availableSlots = [];
+    const availableSlots: Array<{
+      start: string;
+      end: string;
+      duration: number;
+    }> = [];
     const targetDate = new Date(date);
     
     for (let hour = workingHours.start; hour < workingHours.end; hour++) {
