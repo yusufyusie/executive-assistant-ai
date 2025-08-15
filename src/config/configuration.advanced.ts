@@ -1,7 +1,7 @@
 /**
  * Executive Assistant AI - Advanced Configuration Management System
  * World-class, type-safe, dynamic configuration with validation and feature flags
- *
+ * 
  * @fileoverview Comprehensive configuration system supporting:
  * - Environment-specific configurations
  * - Runtime configuration updates
@@ -9,7 +9,7 @@
  * - Validation and type safety
  * - Performance optimization settings
  * - Security configurations
- *
+ * 
  * @version 2.0.0
  * @author Executive Assistant AI Team
  */
@@ -367,7 +367,6 @@ export const createConfiguration = (): AppConfig => {
   const errors = validateSync(config, {
     whitelist: true,
     forbidNonWhitelisted: true,
-    transform: true,
   });
 
   if (errors.length > 0) {
@@ -381,82 +380,160 @@ export const createConfiguration = (): AppConfig => {
 };
 
 /**
+ * Configuration validation utilities
+ */
+export class ConfigurationValidator {
+  /**
+   * Validate configuration for production environment
+   */
+  static validateProductionConfig(config: AppConfig): string[] {
+    const errors: string[] = [];
+
+    if (config.application.environment === Environment.PRODUCTION) {
+      // AI Services validation
+      if (!config.aiServices.geminiApiKey) {
+        errors.push('GEMINI_API_KEY is required in production');
+      }
+
+      // Email services validation
+      if (!config.emailServices.sendgridApiKey) {
+        errors.push('SENDGRID_API_KEY is required in production');
+      }
+
+      // Google services validation
+      if (!config.googleServices.clientId || !config.googleServices.clientSecret) {
+        errors.push('Google OAuth credentials are required in production');
+      }
+
+      // Security validation
+      if (config.security.jwtSecret === 'dev-jwt-secret-change-in-production') {
+        errors.push('JWT_SECRET must be changed in production');
+      }
+
+      if (config.security.apiKey === 'dev-api-key-change-in-production') {
+        errors.push('API_KEY must be changed in production');
+      }
+    }
+
+    return errors;
+  }
+
+  /**
+   * Validate API rate limits and quotas
+   */
+  static validateApiLimits(config: AppConfig): string[] {
+    const errors: string[] = [];
+
+    // Gemini API limits (free tier: 15 requests/minute)
+    if (config.aiServices.requestsPerMinute > 15) {
+      errors.push('GEMINI_REQUESTS_PER_MINUTE exceeds free tier limit of 15');
+    }
+
+    // SendGrid limits (free tier: 100 emails/day)
+    if (config.emailServices.dailyLimit > 100) {
+      errors.push('EMAIL_DAILY_LIMIT exceeds free tier limit of 100');
+    }
+
+    return errors;
+  }
+
+  /**
+   * Get configuration health status
+   */
+  static getConfigurationHealth(config: AppConfig): {
+    status: 'healthy' | 'warning' | 'error';
+    issues: string[];
+    recommendations: string[];
+  } {
+    const issues: string[] = [];
+    const recommendations: string[] = [];
+
+    // Check for missing API keys
+    if (!config.aiServices.geminiApiKey) {
+      issues.push('Gemini API key not configured - AI features will use mock responses');
+      recommendations.push('Add GEMINI_API_KEY to enable AI functionality');
+    }
+
+    if (!config.emailServices.sendgridApiKey) {
+      issues.push('SendGrid API key not configured - email features will use mock responses');
+      recommendations.push('Add SENDGRID_API_KEY to enable email functionality');
+    }
+
+    if (!config.googleServices.clientId) {
+      issues.push('Google OAuth not configured - calendar features will use mock responses');
+      recommendations.push('Add Google OAuth credentials to enable calendar functionality');
+    }
+
+    // Performance recommendations
+    if (config.performance.rateLimitMax > 200) {
+      recommendations.push('Consider lowering rate limit for better resource management');
+    }
+
+    if (!config.performance.enableCaching) {
+      recommendations.push('Enable caching for better performance');
+    }
+
+    // Security recommendations
+    if (config.application.environment === Environment.PRODUCTION) {
+      if (!config.security.enableRateLimit) {
+        issues.push('Rate limiting disabled in production');
+        recommendations.push('Enable rate limiting for production security');
+      }
+    }
+
+    const status = issues.length > 0 ? 'warning' : 'healthy';
+
+    return { status, issues, recommendations };
+  }
+}
+
+/**
+ * Configuration manager for runtime updates
+ */
+export class ConfigurationManager {
+  private static instance: ConfigurationManager;
+  private config: AppConfig;
+
+  private constructor(config: AppConfig) {
+    this.config = config;
+  }
+
+  static getInstance(config?: AppConfig): ConfigurationManager {
+    if (!ConfigurationManager.instance) {
+      if (!config) {
+        throw new Error('Configuration must be provided for first initialization');
+      }
+      ConfigurationManager.instance = new ConfigurationManager(config);
+    }
+    return ConfigurationManager.instance;
+  }
+
+  getConfig(): AppConfig {
+    return this.config;
+  }
+
+  updateFeatureFlag(feature: keyof FeatureFlagsConfig, enabled: boolean): void {
+    this.config.features[feature] = enabled;
+  }
+
+  isFeatureEnabled(feature: keyof FeatureFlagsConfig): boolean {
+    return this.config.features[feature];
+  }
+
+  getEnvironment(): Environment {
+    return this.config.application.environment;
+  }
+
+  isProduction(): boolean {
+    return this.config.application.environment === Environment.PRODUCTION;
+  }
+
+  isDevelopment(): boolean {
+    return this.config.application.environment === Environment.DEVELOPMENT;
+  }
+}
+
+/**
  * Default configuration export
  */
 export default createConfiguration;
-
-export default (): AppConfig => ({
-  app: {
-    name: process.env.APP_NAME || 'Executive Assistant AI',
-    port: parseInt(process.env.PORT || '3000', 10),
-    environment: process.env.NODE_ENV || 'development',
-  },
-  gemini: {
-    apiKey: process.env.GEMINI_API_KEY || '',
-    model: process.env.GEMINI_MODEL || 'gemini-2.0-flash-exp',
-  },
-  google: {
-    clientId: process.env.GOOGLE_CLIENT_ID || '',
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
-    redirectUri: process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3000/auth/google/callback',
-    refreshToken: process.env.GOOGLE_REFRESH_TOKEN || '',
-  },
-  sendgrid: {
-    apiKey: process.env.SENDGRID_API_KEY || '',
-    fromEmail: process.env.SENDGRID_FROM_EMAIL || 'assistant@company.com',
-    fromName: process.env.SENDGRID_FROM_NAME || 'Executive Assistant AI',
-  },
-  gcp: {
-    projectId: process.env.GCP_PROJECT_ID || '',
-    region: process.env.GCP_REGION || 'us-central1',
-    schedulerTimezone: process.env.GCP_SCHEDULER_TIMEZONE || 'America/New_York',
-  },
-  application: {
-    defaultTimezone: process.env.DEFAULT_TIMEZONE || 'America/New_York',
-    maxCalendarDaysAhead: parseInt(process.env.MAX_CALENDAR_DAYS_AHEAD || '90', 10),
-    emailRateLimitPerHour: parseInt(process.env.EMAIL_RATE_LIMIT_PER_HOUR || '50', 10),
-    taskReminderAdvanceHours: parseInt(process.env.TASK_REMINDER_ADVANCE_HOURS || '24', 10),
-  },
-  security: {
-    jwtSecret: process.env.JWT_SECRET || 'dev-secret-key',
-    apiKey: process.env.API_KEY || 'dev-api-key',
-  },
-  logging: {
-    level: process.env.LOG_LEVEL || 'info',
-    format: process.env.LOG_FORMAT || 'json',
-  },
-});
-
-// Configuration validation helper
-export const validateConfig = (config: AppConfig): string[] => {
-  const errors: string[] = [];
-
-  // Validate required API keys in production
-  if (config.app.environment === 'production') {
-    if (!config.gemini.apiKey) {
-      errors.push('GEMINI_API_KEY is required in production');
-    }
-    if (!config.sendgrid.apiKey) {
-      errors.push('SENDGRID_API_KEY is required in production');
-    }
-    if (!config.google.clientId || !config.google.clientSecret) {
-      errors.push('Google OAuth credentials are required in production');
-    }
-    if (!config.security.jwtSecret) {
-      errors.push('JWT_SECRET is required in production');
-    }
-  }
-
-  // Validate port range
-  if (config.app.port < 1 || config.app.port > 65535) {
-    errors.push('PORT must be between 1 and 65535');
-  }
-
-  // Validate email format
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (config.sendgrid.fromEmail && !emailRegex.test(config.sendgrid.fromEmail)) {
-    errors.push('SENDGRID_FROM_EMAIL must be a valid email address');
-  }
-
-  return errors;
-};
