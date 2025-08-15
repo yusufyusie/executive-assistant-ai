@@ -34,9 +34,9 @@ export class AppMinimalModule implements OnModuleInit {
 
   onModuleInit() {
     this.logger.log('🚀 Executive Assistant AI (Minimal Demo) initialized');
-    this.logger.log(`📊 Environment: ${this.configService.get('app.environment')}`);
-    this.logger.log(`🔧 Port: ${this.configService.get('app.port')}`);
-    
+    this.logger.log(`📊 Environment: ${this.configService.get('application.environment', 'development')}`);
+    this.logger.log(`🔧 Port: ${this.configService.get('application.port', 3001)}`);
+
     // Log architecture demonstration
     this.logger.log('🏗️ Architecture: Clean Architecture Demonstration');
     this.logger.log('📐 Patterns: Domain-Driven Design, CQRS, Repository Pattern');
