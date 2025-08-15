@@ -129,8 +129,9 @@ npm run demo
 ### **4. Access Endpoints**
 - **🌐 Main App**: http://localhost:3000
 - **📚 API Docs**: http://localhost:3000/api/docs
-- **🧪 API Demo**: http://localhost:3004
 - **💚 Health Check**: http://localhost:3000/health
+- **🔌 API Status**: http://localhost:3000/apis
+- **🧪 API Testing**: http://localhost:3000/test-apis
 
 ## 📊 **API Endpoints**
 
@@ -226,11 +227,13 @@ FEATURE_PROACTIVE_AUTOMATION=true
 
 ## 🚀 **Getting Started for Evaluation**
 
-1. **Quick Demo**: `npm run demo` → http://localhost:3004
-2. **API Testing**: Visit http://localhost:3004/test-apis
-3. **Documentation**: Open [DOCUMENTATION.md](./DOCUMENTATION.md)
-4. **Architecture**: Review src/ directory structure
-5. **Git History**: `git log --oneline` for professional commits
+1. **Start Application**: `npm run start:dev` → http://localhost:3000
+2. **API Testing**: Visit http://localhost:3000/test-apis
+3. **API Documentation**: Visit http://localhost:3000/api/docs
+4. **Health Check**: Visit http://localhost:3000/health
+5. **Documentation**: Open [DOCUMENTATION.md](./DOCUMENTATION.md)
+6. **Architecture**: Review src/ directory structure
+7. **Git History**: `git log --oneline` for professional commits
 
 ## 📞 **Contact & Submission**
 

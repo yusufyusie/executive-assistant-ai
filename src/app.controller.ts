@@ -29,4 +29,14 @@ export class AppController {
   getMetrics(): any {
     return this.appService.getMetrics();
   }
+
+  @Get('apis')
+  getApiStatus(): any {
+    return this.appService.getApiStatus();
+  }
+
+  @Get('test-apis')
+  testApis(): any {
+    return this.appService.testApis();
+  }
 }
