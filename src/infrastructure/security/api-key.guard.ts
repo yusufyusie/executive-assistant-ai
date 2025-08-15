@@ -20,7 +20,7 @@ export class ApiKeyGuard implements CanActivate {
     this.validApiKeys = new Set([
       apiKey,
       ...additionalKeys.split(',').filter(key => key.trim()),
-    ].filter(Boolean));
+    ].filter((key): key is string => Boolean(key)));
 
     this.logger.log(`Initialized with ${this.validApiKeys.size} valid API keys`);
   }

@@ -148,12 +148,19 @@ export class GoogleCalendarService {
         id: createdEvent.id,
         summary: createdEvent.summary,
         description: createdEvent.description,
-        start: createdEvent.start.dateTime,
-        end: createdEvent.end.dateTime,
-        attendees: createdEvent.attendees?.map((a: any) => a.email) || [],
+        start: {
+          dateTime: createdEvent.start.dateTime,
+          timeZone: createdEvent.start.timeZone || 'UTC',
+        },
+        end: {
+          dateTime: createdEvent.end.dateTime,
+          timeZone: createdEvent.end.timeZone || 'UTC',
+        },
+        attendees: createdEvent.attendees?.map((a: any) => ({
+          email: a.email,
+          responseStatus: a.responseStatus || 'needsAction',
+        })) || [],
         location: createdEvent.location,
-        status: 'confirmed',
-        htmlLink: createdEvent.htmlLink,
       };
 
     } catch (error) {
@@ -177,8 +184,8 @@ export class GoogleCalendarService {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: new URLSearchParams({
-          client_id: this.config.get('GOOGLE_CLIENT_ID'),
-          client_secret: this.config.get('GOOGLE_CLIENT_SECRET'),
+          client_id: this.config.get('GOOGLE_CLIENT_ID') || '',
+          client_secret: this.config.get('GOOGLE_CLIENT_SECRET') || '',
           refresh_token: refreshToken,
           grant_type: 'refresh_token',
         }),
@@ -445,7 +452,11 @@ export class GoogleCalendarService {
     end: string;
     attendeeAvailability: Record<string, boolean>;
   }> {
-    const slots = [];
+    const slots: Array<{
+      start: string;
+      end: string;
+      attendeeAvailability: Record<string, boolean>;
+    }> = [];
     const start = new Date(startDate);
     const end = new Date(endDate);
     
