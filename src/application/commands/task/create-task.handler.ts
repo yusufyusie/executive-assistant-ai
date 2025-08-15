@@ -10,7 +10,7 @@ import { CreateTaskCommand } from './create-task.command';
 import { TaskResponseDto } from '../../dtos/task.dto';
 import { Task } from '../../../domain/entities/task.entity';
 import type { TaskRepository } from '../../../domain/repositories/task.repository';
-import { Priority, TaskStatus, Email } from '../../../domain/common/value-objects';
+// Value objects are created internally by Task.create
 
 @Injectable()
 export class CreateTaskHandler implements CommandHandler<CreateTaskCommand, Result<TaskResponseDto, string>> {
@@ -26,9 +26,6 @@ export class CreateTaskHandler implements CommandHandler<CreateTaskCommand, Resu
       }
 
       // Create value objects
-      const priority = new Priority(data.priority || 'medium');
-      const status = new TaskStatus('pending');
-      const assignee = data.assignee ? new Email(data.assignee) : undefined;
       const dueDate = data.dueDate ? new Date(data.dueDate) : undefined;
 
       // Validate due date
@@ -40,9 +37,8 @@ export class CreateTaskHandler implements CommandHandler<CreateTaskCommand, Resu
       const task = Task.create({
         title: data.title.trim(),
         description: data.description?.trim(),
-        status: status.value,
-        priority: priority.value,
-        assignee: assignee?.value,
+        priority: data.priority || 'medium',
+        assignee: data.assignee,
         dueDate,
         tags: data.tags || [],
         estimatedDuration: data.estimatedDuration,

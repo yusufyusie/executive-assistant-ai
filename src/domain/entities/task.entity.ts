@@ -309,7 +309,7 @@ export class Task extends AggregateRoot {
   }
 
   // Factory method for creating tasks
-  public static create(props: Omit<TaskProps, 'status' | 'priority'> & {
+  public static create(props: Omit<TaskProps, 'status' | 'priority' | 'assignee'> & {
     status?: string;
     priority?: string;
     assignee?: string;

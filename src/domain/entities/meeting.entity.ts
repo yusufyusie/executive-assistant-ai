@@ -117,7 +117,7 @@ export class Meeting extends AggregateRoot {
     return this._status;
   }
 
-  get remindersSent(): readonly Array<{ type: string; sentAt: Date }> {
+  get remindersSent(): Array<{ type: string; sentAt: Date }> {
     return [...this._remindersSent];
   }
 
@@ -130,7 +130,7 @@ export class Meeting extends AggregateRoot {
     return this._status === 'scheduled' && this._dateRange.contains(now);
   }
 
-  get hasConflictWith(other: Meeting): boolean {
+  hasConflictWith(other: Meeting): boolean {
     return this._dateRange.overlaps(other._dateRange);
   }
 
