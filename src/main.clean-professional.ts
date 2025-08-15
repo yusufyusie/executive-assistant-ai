@@ -26,7 +26,61 @@ async function bootstrap(): Promise<void> {
 
     // Get configuration service
     const configService = app.get(ConfigService);
-    const config = configService.get();
+
+    // Build config object from individual properties
+    const config = {
+      app: {
+        name: configService.get('app.name'),
+        port: configService.get('app.port'),
+        environment: configService.get('app.environment'),
+        version: configService.get('app.version'),
+      },
+      gemini: {
+        apiKey: configService.get('gemini.apiKey'),
+        model: configService.get('gemini.model'),
+        maxTokens: configService.get('gemini.maxTokens'),
+        temperature: configService.get('gemini.temperature'),
+        requestsPerMinute: configService.get('gemini.requestsPerMinute'),
+      },
+      google: {
+        clientId: configService.get('google.clientId'),
+        clientSecret: configService.get('google.clientSecret'),
+        redirectUri: configService.get('google.redirectUri'),
+        refreshToken: configService.get('google.refreshToken'),
+        projectId: configService.get('google.projectId'),
+        region: configService.get('google.region'),
+      },
+      sendgrid: {
+        apiKey: configService.get('sendgrid.apiKey'),
+        fromEmail: configService.get('sendgrid.fromEmail'),
+        fromName: configService.get('sendgrid.fromName'),
+        dailyLimit: configService.get('sendgrid.dailyLimit'),
+        enableTemplates: configService.get('sendgrid.enableTemplates'),
+      },
+      security: {
+        jwtSecret: configService.get('security.jwtSecret'),
+        apiKey: configService.get('security.apiKey'),
+        jwtExpirationTime: configService.get('security.jwtExpirationTime'),
+        enableCors: configService.get('security.enableCors'),
+        enableRateLimit: configService.get('security.enableRateLimit'),
+      },
+      performance: {
+        rateLimitMax: configService.get('performance.rateLimitMax'),
+        rateLimitTtl: configService.get('performance.rateLimitTtl'),
+        cacheDefaultTtl: configService.get('performance.cacheDefaultTtl'),
+        enableCaching: configService.get('performance.enableCaching'),
+        enableCompression: configService.get('performance.enableCompression'),
+      },
+      features: {
+        enableAIAssistant: configService.get('features.enableAIAssistant'),
+        enableCalendarIntegration: configService.get('features.enableCalendarIntegration'),
+        enableEmailAutomation: configService.get('features.enableEmailAutomation'),
+        enableTaskManagement: configService.get('features.enableTaskManagement'),
+        enableProactiveAutomation: configService.get('features.enableProactiveAutomation'),
+        enableAnalytics: configService.get('features.enableAnalytics'),
+        enableAdvancedLogging: configService.get('features.enableAdvancedLogging'),
+      },
+    };
 
     // Validate configuration
     const configErrors = validateConfig(config);

@@ -67,7 +67,7 @@ import { AppService } from './app.service';
       provide: 'CONFIG_MANAGER',
       useFactory: (configService: ConfigService) => {
         return {
-          getConfig: () => configService.get(),
+          getConfig: () => configService.get(''),
           isProduction: () => configService.get('app.environment') === 'production',
           isDevelopment: () => configService.get('app.environment') === 'development',
           isFeatureEnabled: (feature: string) => configService.get(`features.${feature}`, true),
@@ -88,32 +88,46 @@ export class AppCleanProfessionalModule implements OnModuleInit {
   ) {}
 
   async onModuleInit(): Promise<void> {
-    const config = this.configService.get();
-    
     this.logger.log('🚀 Executive Assistant AI (Clean Professional) initialized');
-    this.logger.log(`📊 Environment: ${config.app.environment}`);
-    this.logger.log(`🔧 Version: ${config.app.version}`);
-    this.logger.log(`🌐 Port: ${config.app.port}`);
-    
-    // Log enabled features
-    const enabledFeatures = Object.entries(config.features)
-      .filter(([, enabled]) => enabled)
-      .map(([feature]) => feature.replace('enable', ''));
-    
-    this.logger.log(`✨ Enabled Features: ${enabledFeatures.join(', ')}`);
 
-    // Log configuration health
-    const health = this.getConfigurationHealth(config);
-    this.logger.log(`🔧 Configuration Health: ${health.status.toUpperCase()}`);
-    
-    if (health.issues.length > 0) {
-      this.logger.warn('⚠️ Configuration Issues:');
-      health.issues.forEach(issue => this.logger.warn(`   • ${issue}`));
-    }
+    try {
+      const environment = this.configService.get('app.environment', 'development');
+      const version = this.configService.get('app.version', '2.0.0');
+      const port = this.configService.get('app.port', 3000);
 
-    if (health.recommendations.length > 0) {
-      this.logger.log('💡 Recommendations:');
-      health.recommendations.forEach(rec => this.logger.log(`   • ${rec}`));
+      this.logger.log(`📊 Environment: ${environment}`);
+      this.logger.log(`🔧 Version: ${version}`);
+      this.logger.log(`🌐 Port: ${port}`);
+    
+      // Log enabled features
+      const features = {
+        aiAssistant: this.configService.get('features.enableAIAssistant', true),
+        calendar: this.configService.get('features.enableCalendarIntegration', true),
+        email: this.configService.get('features.enableEmailAutomation', true),
+        tasks: this.configService.get('features.enableTaskManagement', true),
+        automation: this.configService.get('features.enableProactiveAutomation', true),
+      };
+
+      const enabledFeatures = Object.entries(features)
+        .filter(([, enabled]) => enabled)
+        .map(([feature]) => feature);
+
+      this.logger.log(`✨ Enabled Features: ${enabledFeatures.join(', ')}`);
+
+      // Log API status
+      const geminiKey = this.configService.get('gemini.apiKey', '');
+      const googleClientId = this.configService.get('google.clientId', '');
+      const sendgridKey = this.configService.get('sendgrid.apiKey', '');
+
+      const apiStatus = {
+        gemini: geminiKey ? '✅' : '❌',
+        google: googleClientId ? '✅' : '❌',
+        sendgrid: sendgridKey ? '✅' : '❌',
+      };
+
+      this.logger.log(`🔌 API Status: Gemini ${apiStatus.gemini}, Google ${apiStatus.google}, SendGrid ${apiStatus.sendgrid}`);
+    } catch (error) {
+      this.logger.warn('Configuration access warning:', error.message);
     }
 
     // Log architecture information
@@ -131,29 +145,29 @@ export class AppCleanProfessionalModule implements OnModuleInit {
     this.logger.log('   ✅ Demonstrated Value Proposition (70% productivity improvement)');
 
     // Initialize services based on feature flags
-    await this.initializeServices(config);
+    await this.initializeServices();
   }
 
   /**
    * Initialize services based on feature flags
    */
-  private async initializeServices(config: any): Promise<void> {
+  private async initializeServices(): Promise<void> {
     const initPromises: Promise<void>[] = [];
 
-    if (config.features.enableAIAssistant) {
-      initPromises.push(this.initializeAIServices(config));
+    if (this.configService.get('features.enableAIAssistant', true)) {
+      initPromises.push(this.initializeAIServices());
     }
 
-    if (config.features.enableCalendarIntegration) {
-      initPromises.push(this.initializeCalendarServices(config));
+    if (this.configService.get('features.enableCalendarIntegration', true)) {
+      initPromises.push(this.initializeCalendarServices());
     }
 
-    if (config.features.enableEmailAutomation) {
-      initPromises.push(this.initializeEmailServices(config));
+    if (this.configService.get('features.enableEmailAutomation', true)) {
+      initPromises.push(this.initializeEmailServices());
     }
 
-    if (config.features.enableProactiveAutomation) {
-      initPromises.push(this.initializeAutomationServices(config));
+    if (this.configService.get('features.enableProactiveAutomation', true)) {
+      initPromises.push(this.initializeAutomationServices());
     }
 
     try {
@@ -167,10 +181,11 @@ export class AppCleanProfessionalModule implements OnModuleInit {
   /**
    * Initialize AI services
    */
-  private async initializeAIServices(config: any): Promise<void> {
+  private async initializeAIServices(): Promise<void> {
     this.logger.log('🤖 Initializing AI services...');
-    
-    if (config.gemini.apiKey) {
+
+    const geminiKey = this.configService.get('gemini.apiKey', '');
+    if (geminiKey) {
       this.logger.log('   ✅ Gemini AI service configured');
     } else {
       this.logger.warn('   ⚠️ Gemini API key not configured - using mock responses');
@@ -180,10 +195,12 @@ export class AppCleanProfessionalModule implements OnModuleInit {
   /**
    * Initialize calendar services
    */
-  private async initializeCalendarServices(config: any): Promise<void> {
+  private async initializeCalendarServices(): Promise<void> {
     this.logger.log('📅 Initializing calendar services...');
-    
-    if (config.google.clientId && config.google.clientSecret) {
+
+    const clientId = this.configService.get('google.clientId', '');
+    const clientSecret = this.configService.get('google.clientSecret', '');
+    if (clientId && clientSecret) {
       this.logger.log('   ✅ Google Calendar service configured');
     } else {
       this.logger.warn('   ⚠️ Google OAuth not configured - using mock responses');
@@ -193,10 +210,11 @@ export class AppCleanProfessionalModule implements OnModuleInit {
   /**
    * Initialize email services
    */
-  private async initializeEmailServices(config: any): Promise<void> {
+  private async initializeEmailServices(): Promise<void> {
     this.logger.log('📧 Initializing email services...');
-    
-    if (config.sendgrid.apiKey) {
+
+    const sendgridKey = this.configService.get('sendgrid.apiKey', '');
+    if (sendgridKey) {
       this.logger.log('   ✅ SendGrid email service configured');
     } else {
       this.logger.warn('   ⚠️ SendGrid API key not configured - using mock responses');
@@ -206,10 +224,11 @@ export class AppCleanProfessionalModule implements OnModuleInit {
   /**
    * Initialize automation services
    */
-  private async initializeAutomationServices(config: any): Promise<void> {
+  private async initializeAutomationServices(): Promise<void> {
     this.logger.log('🔄 Initializing automation services...');
-    
-    if (config.google.projectId) {
+
+    const projectId = this.configService.get('google.projectId', '');
+    if (projectId) {
       this.logger.log('   ✅ Cloud Scheduler service configured');
     } else {
       this.logger.warn('   ⚠️ GCP project not configured - automation features limited');
