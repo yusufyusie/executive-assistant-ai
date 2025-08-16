@@ -20,15 +20,10 @@ import {
   AssistantResponse,
 } from '../../../application/services/ai-assistant.service';
 
-// DTOs for request/response
-export class ProcessRequestDto {
-  input: string;
-  context?: {
-    userId?: string;
-    timezone?: string;
-    preferences?: Record<string, any>;
-  };
-}
+import {
+  ProcessRequestDto,
+  AssistantResponseDto,
+} from '../dto/assistant.dto';
 
 @Controller('api/assistant')
 export class AssistantController {

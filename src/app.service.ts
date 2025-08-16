@@ -8,7 +8,7 @@ export class AppService {
   getApiInfo(): any {
     return {
       name: this.configService.get<string>('app.name'),
-      version: '1.0.0',
+      version: '2.0.0',
       description: 'AI-powered Executive Assistant automation platform',
       environment: this.configService.get<string>('app.environment'),
       documentation: {
