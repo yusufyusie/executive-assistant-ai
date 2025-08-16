@@ -25,19 +25,19 @@ async function testEndpoint(method, endpoint, data = null) {
     const response = await fetch(`${baseUrl}${endpoint}`, options);
     const result = await response.json();
 
-    console.log(`✅ Status: ${response.status} ${response.statusText}`);
-    console.log(`📄 Response:`, JSON.stringify(result, null, 2));
+    console.log(`Status: ${response.status} ${response.statusText}`);
+    console.log(`Response:`, JSON.stringify(result, null, 2));
 
     return { success: true, status: response.status, data: result };
   } catch (error) {
-    console.log(`❌ Error: ${error.message}`);
+    console.log(`Error: ${error.message}`);
     return { success: false, error: error.message };
   }
 }
 
 // Main testing function
 async function runTests() {
-  console.log('🚀 Executive Assistant AI - Endpoint Testing');
+  console.log('Executive Assistant AI - Endpoint Testing');
   console.log('='.repeat(60));
 
   // Test 1: Application Info
@@ -127,7 +127,7 @@ async function runTests() {
   await testEndpoint('GET', '/api/email/health');
   await testEndpoint('GET', '/api/automation/health');
 
-  console.log('\n🎉 Testing Complete!');
+  console.log('\nTesting Complete!');
   console.log('='.repeat(60));
 }
 

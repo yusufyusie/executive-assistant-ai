@@ -245,15 +245,15 @@ export class GeminiService {
       return {
         text:
           "I'm your AI Executive Assistant, ready to help with:\n\n" +
-          '📅 **Calendar Management**\n' +
+          '**Calendar Management**\n' +
           '• Schedule meetings intelligently\n' +
           '• Check availability and conflicts\n' +
           '• Send meeting reminders\n\n' +
-          '✅ **Task Management**\n' +
+          '**Task Management**\n' +
           '• Create and prioritize tasks\n' +
           '• Track deadlines and progress\n' +
           '• Provide productivity insights\n\n' +
-          '📧 **Email Automation**\n' +
+          '**Email Automation**\n' +
           '• Draft professional emails\n' +
           '• Send follow-ups and reminders\n' +
           '• Manage email templates\n\n' +

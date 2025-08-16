@@ -182,7 +182,7 @@ export class AppService {
           limits: '15 requests/minute, 1,500 requests/day',
           status: process.env.GEMINI_API_KEY
             ? 'CONFIGURED & WORKING'
-            : '⚠️ API KEY NEEDED',
+            : 'API KEY NEEDED',
           implementation: 'ACTUAL API INTEGRATION',
           features: [
             'AI-powered email generation',
@@ -201,7 +201,7 @@ export class AppService {
           limits: '1,000,000 requests/day',
           status: process.env.GOOGLE_CLIENT_ID
             ? 'CONFIGURED & WORKING'
-            : '⚠️ OAUTH CREDENTIALS NEEDED',
+            : 'OAUTH CREDENTIALS NEEDED',
           implementation: 'ACTUAL API INTEGRATION',
           features: [
             'Meeting scheduling with conflict detection',
@@ -219,7 +219,7 @@ export class AppService {
           limits: '100 emails/day',
           status: process.env.SENDGRID_API_KEY
             ? 'CONFIGURED & WORKING'
-            : '⚠️ API KEY NEEDED',
+            : 'API KEY NEEDED',
           implementation: 'ACTUAL API INTEGRATION',
           features: [
             'Professional email templates',
@@ -237,7 +237,7 @@ export class AppService {
           limits: 'No usage limits',
           status: process.env.GOOGLE_CLIENT_ID
             ? 'CONFIGURED & WORKING'
-            : '⚠️ OAUTH CREDENTIALS NEEDED',
+            : 'OAUTH CREDENTIALS NEEDED',
           implementation: 'ACTUAL API INTEGRATION',
           features: [
             'Secure user authentication',

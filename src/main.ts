@@ -111,12 +111,12 @@ async function bootstrap() {
     // Start the application
     await app.listen(port);
 
-    logger.log(`🚀 Executive Assistant AI started successfully!`);
-    logger.log(`🌐 Server running on: http://localhost:${port}`);
-    logger.log(`📊 Environment: ${nodeEnv}`);
-    logger.log(`🔧 Features: AI Assistant, Calendar, Email, Tasks, Automation`);
+    logger.log(`Executive Assistant AI started successfully!`);
+    logger.log(`Server running on: http://localhost:${port}`);
+    logger.log(`Environment: ${nodeEnv}`);
+    logger.log(`Features: AI Assistant, Calendar, Email, Tasks, Automation`);
 
-    logger.log(`📋 Available endpoints:`);
+    logger.log(`Available endpoints:`);
     logger.log(`   • GET  /                     - Application info`);
     logger.log(`   • GET  /health               - Health check`);
     logger.log(`   • GET  /api/docs             - API Documentation (Swagger)`);
@@ -126,7 +126,7 @@ async function bootstrap() {
     logger.log(`   • GET  /api/tasks            - Get tasks`);
     logger.log(`   • GET  /api/automation/briefing - Daily briefing`);
   } catch (error) {
-    logger.error('❌ Failed to start application', error.stack);
+    logger.error('Failed to start application', error.stack);
     process.exit(1);
   }
 }

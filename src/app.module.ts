@@ -65,14 +65,14 @@ export class AppModule implements OnModuleInit {
     const port = this.configService.get('PORT', 3000);
 
     this.logger.log(
-      `🚀 ${appName} v${appVersion} starting in ${environment} mode`,
+      `${appName} v${appVersion} starting in ${environment} mode`,
     );
-    this.logger.log(`📡 Server will be available on port ${port}`);
+    this.logger.log(`Server will be available on port ${port}`);
 
     // Log feature status
     this.logFeatureStatus();
 
-    this.logger.log('✅ Application module initialized successfully');
+    this.logger.log('Application module initialized successfully');
   }
 
   private logFeatureStatus(): void {
@@ -85,7 +85,7 @@ export class AppModule implements OnModuleInit {
       analytics: true,
     };
 
-    this.logger.log('🎛️  Feature Status:', JSON.stringify(features, null, 2));
+    this.logger.log('Feature Status:', JSON.stringify(features, null, 2));
   }
 
   // Health check method

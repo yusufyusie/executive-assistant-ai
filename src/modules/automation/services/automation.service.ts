@@ -108,10 +108,10 @@ export class AutomationService {
       const summary = this.summarizeResults(results);
       this.completeAutomationRun(automationRun, summary);
 
-      this.logger.log('✅ Daily proactive automation completed successfully');
+      this.logger.log('Daily proactive automation completed successfully');
     } catch (error) {
       this.failAutomationRun(automationRun, error.message);
-      this.logger.error('❌ Daily proactive automation failed', error.stack);
+      this.logger.error('Daily proactive automation failed', error.stack);
     }
   }
 
@@ -124,7 +124,7 @@ export class AutomationService {
     const automationRun = this.createAutomationRun('weekly_automation');
 
     try {
-      this.logger.log('🗓️ Starting weekly automation...');
+      this.logger.log('Starting weekly automation...');
 
       const results = await Promise.allSettled([
         this.generateWeeklySummary(),
@@ -136,10 +136,10 @@ export class AutomationService {
       const summary = this.summarizeResults(results);
       this.completeAutomationRun(automationRun, summary);
 
-      this.logger.log('✅ Weekly automation completed successfully');
+      this.logger.log('Weekly automation completed successfully');
     } catch (error) {
       this.failAutomationRun(automationRun, error.message);
-      this.logger.error('❌ Weekly automation failed', error.stack);
+      this.logger.error('Weekly automation failed', error.stack);
     }
   }
 
@@ -367,7 +367,7 @@ export class AutomationService {
         });
       }
 
-      this.logger.log(`📬 Sent ${reminders.length} proactive reminders`);
+      this.logger.log(`Sent ${reminders.length} proactive reminders`);
       return { reminders, totalSent: reminders.length };
     } catch (error) {
       this.logger.error('Failed to send proactive reminders', error.stack);
