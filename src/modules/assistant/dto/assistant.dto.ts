@@ -14,30 +14,6 @@ import {
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-export class ProcessRequestDto {
-  @ApiProperty({
-    description: 'The user input to process',
-    example: 'Schedule a meeting with John next Tuesday at 2 PM',
-  })
-  @IsString()
-  input: string;
-
-  @ApiPropertyOptional({
-    description: 'Additional context for the request',
-    example: { userId: 'user123', timezone: 'America/New_York' },
-  })
-  @IsOptional()
-  @IsObject()
-  context?: Record<string, any>;
-
-  @ApiPropertyOptional({
-    description: 'Processing options',
-  })
-  @IsOptional()
-  @IsObject()
-  options?: ProcessingOptions;
-}
-
 export class ProcessingOptions {
   @ApiPropertyOptional({
     description: 'AI model temperature (0-1)',
@@ -69,6 +45,30 @@ export class ProcessingOptions {
   })
   @IsOptional()
   includeReasoning?: boolean = false;
+}
+
+export class ProcessRequestDto {
+  @ApiProperty({
+    description: 'The user input to process',
+    example: 'Schedule a meeting with John next Tuesday at 2 PM',
+  })
+  @IsString()
+  input: string;
+
+  @ApiPropertyOptional({
+    description: 'Additional context for the request',
+    example: { userId: 'user123', timezone: 'America/New_York' },
+  })
+  @IsOptional()
+  @IsObject()
+  context?: Record<string, any>;
+
+  @ApiPropertyOptional({
+    description: 'Processing options',
+  })
+  @IsOptional()
+  @IsObject()
+  options?: ProcessingOptions;
 }
 
 export class AssistantResponseDto {

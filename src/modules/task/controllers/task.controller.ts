@@ -20,7 +20,6 @@ import {
   ApiOperation,
   ApiResponse,
   ApiParam,
-  ApiQuery,
 } from '@nestjs/swagger';
 import { TaskApplicationService } from '../../../application/services/task-application.service';
 import {
