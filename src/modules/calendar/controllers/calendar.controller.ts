@@ -21,7 +21,10 @@ export class CalendarController {
   }
 
   @Get('availability')
-  async checkAvailability(@Query('date') date: string, @Query('duration') duration?: number) {
+  async checkAvailability(
+    @Query('date') date: string,
+    @Query('duration') duration?: number,
+  ) {
     return this.calendarService.checkAvailability(date, duration);
   }
 

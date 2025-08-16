@@ -33,7 +33,13 @@ export interface AssistantResponse {
 }
 
 export interface AssistantAction {
-  type: 'create_task' | 'schedule_meeting' | 'send_email' | 'set_reminder' | 'search_calendar' | 'prioritize_tasks';
+  type:
+    | 'create_task'
+    | 'schedule_meeting'
+    | 'send_email'
+    | 'set_reminder'
+    | 'search_calendar'
+    | 'prioritize_tasks';
   parameters: Record<string, any>;
   confidence: number;
   status: 'pending' | 'executed' | 'failed';
@@ -52,15 +58,21 @@ export class AIAssistantService {
     private readonly emailService: SendGridService,
   ) {}
 
-  async processRequest(request: AssistantRequest): Promise<Result<AssistantResponse, string>> {
+  async processRequest(
+    request: AssistantRequest,
+  ): Promise<Result<AssistantResponse, string>> {
     const startTime = Date.now();
-    
+
     try {
-      this.logger.log(`Processing assistant request: ${request.input.substring(0, 100)}...`);
+      this.logger.log(
+        `Processing assistant request: ${request.input.substring(0, 100)}...`,
+      );
 
       // Step 1: Analyze intent using Gemini
-      const intentAnalysis = await this.geminiService.analyzeIntent(request.input);
-      
+      const intentAnalysis = await this.geminiService.analyzeIntent(
+        request.input,
+      );
+
       // Step 2: Generate initial response
       const geminiResponse = await this.geminiService.generateResponse({
         prompt: request.input,
@@ -69,10 +81,16 @@ export class AIAssistantService {
       });
 
       // Step 3: Execute actions based on intent
-      const actions = await this.executeActions(intentAnalysis.actions, request.context);
+      const actions = await this.executeActions(
+        intentAnalysis.actions,
+        request.context,
+      );
 
       // Step 4: Generate suggestions
-      const suggestions = await this.generateSuggestions(intentAnalysis.intent, request.context);
+      const suggestions = await this.generateSuggestions(
+        intentAnalysis.intent,
+        request.context,
+      );
 
       // Step 5: Build response
       const response: AssistantResponse = {
@@ -88,9 +106,10 @@ export class AIAssistantService {
         },
       };
 
-      this.logger.log(`Assistant request processed successfully in ${response.metadata.processingTime}ms`);
+      this.logger.log(
+        `Assistant request processed successfully in ${response.metadata.processingTime}ms`,
+      );
       return success(response);
-
     } catch (error) {
       this.logger.error('Failed to process assistant request', error.stack);
       return failure('Failed to process your request. Please try again.');
@@ -104,7 +123,7 @@ export class AIAssistantService {
 
       // Get calendar events
       const events = await this.calendarService.getEvents(targetDate);
-      
+
       // Get tasks
       const tasksResult = await this.taskService.getTasks({
         filters: {
@@ -118,13 +137,23 @@ export class AIAssistantService {
       }
 
       const tasks = tasksResult.value.items;
-      const urgentTasks = tasks.filter(task => task.priority.priority === 'urgent' || task.priority.priority === 'high');
+      const urgentTasks = tasks.filter(
+        (task) =>
+          task.priority.priority === 'urgent' ||
+          task.priority.priority === 'high',
+      );
 
       // Generate briefing using AI
-      const briefingPrompt = this.buildBriefingPrompt(targetDate, events, tasks, urgentTasks);
+      const briefingPrompt = this.buildBriefingPrompt(
+        targetDate,
+        events,
+        tasks,
+        urgentTasks,
+      );
       const aiResponse = await this.geminiService.generateResponse({
         prompt: briefingPrompt,
-        systemPrompt: 'You are an executive assistant providing a daily briefing. Be concise, professional, and actionable.',
+        systemPrompt:
+          'You are an executive assistant providing a daily briefing. Be concise, professional, and actionable.',
       });
 
       const briefing = {
@@ -142,7 +171,9 @@ export class AIAssistantService {
         },
         tasks: {
           urgent: urgentTasks.slice(0, 3),
-          important: tasks.filter(t => t.priority.priority === 'medium').slice(0, 3),
+          important: tasks
+            .filter((t) => t.priority.priority === 'medium')
+            .slice(0, 3),
         },
         insights: {
           aiSummary: aiResponse.text,
@@ -153,7 +184,6 @@ export class AIAssistantService {
       };
 
       return success(briefing);
-
     } catch (error) {
       this.logger.error('Failed to generate daily briefing', error.stack);
       return failure('Failed to generate daily briefing');
@@ -195,7 +225,10 @@ export class AIAssistantService {
     };
   }
 
-  private async executeActions(actions: any[], context?: any): Promise<AssistantAction[]> {
+  private async executeActions(
+    actions: any[],
+    context?: any,
+  ): Promise<AssistantAction[]> {
     const executedActions: AssistantAction[] = [];
 
     for (const action of actions) {
@@ -209,7 +242,9 @@ export class AIAssistantService {
       try {
         switch (action.type) {
           case 'create_task': {
-            const taskResult = await this.taskService.createTask(action.parameters);
+            const taskResult = await this.taskService.createTask(
+              action.parameters,
+            );
             if (taskResult.isSuccess) {
               assistantAction.status = 'executed';
               assistantAction.result = taskResult.value;
@@ -221,21 +256,27 @@ export class AIAssistantService {
           }
 
           case 'schedule_meeting': {
-            const meetingResult = await this.calendarService.createEvent(action.parameters);
+            const meetingResult = await this.calendarService.createEvent(
+              action.parameters,
+            );
             assistantAction.status = 'executed';
             assistantAction.result = meetingResult;
             break;
           }
 
           case 'send_email': {
-            const emailResult = await this.emailService.sendEmail(action.parameters);
+            const emailResult = await this.emailService.sendEmail(
+              action.parameters,
+            );
             assistantAction.status = 'executed';
             assistantAction.result = emailResult;
             break;
           }
 
           case 'prioritize_tasks': {
-            const prioritizeResult = await this.taskService.prioritizeTasks(action.parameters);
+            const prioritizeResult = await this.taskService.prioritizeTasks(
+              action.parameters,
+            );
             if (prioritizeResult.isSuccess) {
               assistantAction.status = 'executed';
               assistantAction.result = prioritizeResult.value;
@@ -261,7 +302,10 @@ export class AIAssistantService {
     return executedActions;
   }
 
-  private async generateSuggestions(intent: string, context?: any): Promise<string[]> {
+  private async generateSuggestions(
+    intent: string,
+    context?: any,
+  ): Promise<string[]> {
     const suggestions: string[] = [];
 
     switch (intent) {
@@ -284,7 +328,9 @@ export class AIAssistantService {
         break;
 
       default:
-        suggestions.push('Try asking me to create tasks, schedule meetings, or send emails');
+        suggestions.push(
+          'Try asking me to create tasks, schedule meetings, or send emails',
+        );
         suggestions.push('I can help prioritize your workload');
         suggestions.push('Ask for a daily briefing to stay organized');
     }
@@ -312,14 +358,19 @@ Communication style:
 When providing actionable items, structure them clearly with specific parameters. Always consider the user's context and preferences.`;
   }
 
-  private buildBriefingPrompt(date: string, events: any[], tasks: any[], urgentTasks: any[]): string {
+  private buildBriefingPrompt(
+    date: string,
+    events: any[],
+    tasks: any[],
+    urgentTasks: any[],
+  ): string {
     return `Generate a professional daily briefing for ${date}.
 
 Calendar Events (${events.length}):
-${events.map(e => `- ${e.summary} (${e.start?.dateTime || e.start?.date})`).join('\n')}
+${events.map((e) => `- ${e.summary} (${e.start?.dateTime || e.start?.date})`).join('\n')}
 
 Tasks (${tasks.length} total, ${urgentTasks.length} urgent):
-${urgentTasks.map(t => `- [${t.priority.priority.toUpperCase()}] ${t.title}`).join('\n')}
+${urgentTasks.map((t) => `- [${t.priority.priority.toUpperCase()}] ${t.title}`).join('\n')}
 
 Please provide:
 1. A brief overview of the day
@@ -340,36 +391,40 @@ Keep it concise but comprehensive.`;
 
   private detectConflicts(events: any[]): string[] {
     const conflicts: string[] = [];
-    
+
     for (let i = 0; i < events.length - 1; i++) {
       const current = events[i];
       const next = events[i + 1];
-      
+
       const currentEnd = new Date(current.end?.dateTime || current.end?.date);
       const nextStart = new Date(next.start?.dateTime || next.start?.date);
-      
+
       if (currentEnd > nextStart) {
-        conflicts.push(`Conflict between "${current.summary}" and "${next.summary}"`);
+        conflicts.push(
+          `Conflict between "${current.summary}" and "${next.summary}"`,
+        );
       }
     }
-    
+
     return conflicts;
   }
 
   private generateScheduleSuggestions(events: any[]): string[] {
     const suggestions: string[] = [];
-    
+
     if (events.length > 6) {
-      suggestions.push('Heavy meeting day - consider rescheduling non-critical meetings');
+      suggestions.push(
+        'Heavy meeting day - consider rescheduling non-critical meetings',
+      );
     }
-    
+
     if (events.length === 0) {
       suggestions.push('Light meeting day - good opportunity for focused work');
     }
-    
+
     suggestions.push('Block 10-11 AM for deep work if possible');
     suggestions.push('Schedule lunch break at 12:30 PM');
-    
+
     return suggestions;
   }
 
@@ -377,26 +432,28 @@ Keep it concise but comprehensive.`;
     if (events.length > 5) {
       return 'High meeting load today - focus on preparation and follow-ups';
     }
-    
-    if (tasks.filter(t => t.priority.priority === 'urgent').length > 3) {
+
+    if (tasks.filter((t) => t.priority.priority === 'urgent').length > 3) {
       return 'Multiple urgent tasks - consider delegating or rescheduling non-critical items';
     }
-    
+
     return 'Balanced workload - good opportunity for strategic work';
   }
 
   private generateAlerts(events: any[], tasks: any[]): string[] {
     const alerts: string[] = [];
-    
-    const overdueTasks = tasks.filter(task => task.isOverdue);
+
+    const overdueTasks = tasks.filter((task) => task.isOverdue);
     if (overdueTasks.length > 0) {
       alerts.push(`${overdueTasks.length} task(s) are overdue`);
     }
-    
+
     if (events.length > 6) {
-      alerts.push('Heavy meeting day - consider rescheduling non-critical meetings');
+      alerts.push(
+        'Heavy meeting day - consider rescheduling non-critical meetings',
+      );
     }
-    
+
     return alerts;
   }
 }

@@ -180,7 +180,9 @@ export class AppService {
           purpose: 'AI Content Generation & Natural Language Processing',
           tier: 'FREE TIER',
           limits: '15 requests/minute, 1,500 requests/day',
-          status: process.env.GEMINI_API_KEY ? '✅ CONFIGURED & WORKING' : '⚠️ API KEY NEEDED',
+          status: process.env.GEMINI_API_KEY
+            ? '✅ CONFIGURED & WORKING'
+            : '⚠️ API KEY NEEDED',
           implementation: 'ACTUAL API INTEGRATION',
           features: [
             '✅ AI-powered email generation',
@@ -189,14 +191,17 @@ export class AppService {
             '✅ Content summarization',
             '✅ Smart scheduling suggestions',
           ],
-          endpoint: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp',
+          endpoint:
+            'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp',
         },
         googleCalendar: {
           name: 'Google Calendar API',
           purpose: 'Calendar Management & Scheduling',
           tier: 'FREE TIER',
           limits: '1,000,000 requests/day',
-          status: process.env.GOOGLE_CLIENT_ID ? '✅ CONFIGURED & WORKING' : '⚠️ OAUTH CREDENTIALS NEEDED',
+          status: process.env.GOOGLE_CLIENT_ID
+            ? '✅ CONFIGURED & WORKING'
+            : '⚠️ OAUTH CREDENTIALS NEEDED',
           implementation: 'ACTUAL API INTEGRATION',
           features: [
             '✅ Meeting scheduling with conflict detection',
@@ -212,7 +217,9 @@ export class AppService {
           purpose: 'Email Automation & Delivery',
           tier: 'FREE TIER',
           limits: '100 emails/day',
-          status: process.env.SENDGRID_API_KEY ? '✅ CONFIGURED & WORKING' : '⚠️ API KEY NEEDED',
+          status: process.env.SENDGRID_API_KEY
+            ? '✅ CONFIGURED & WORKING'
+            : '⚠️ API KEY NEEDED',
           implementation: 'ACTUAL API INTEGRATION',
           features: [
             '✅ Professional email templates',
@@ -228,7 +235,9 @@ export class AppService {
           purpose: 'Authentication & Authorization',
           tier: 'FREE TIER',
           limits: 'No usage limits',
-          status: process.env.GOOGLE_CLIENT_ID ? '✅ CONFIGURED & WORKING' : '⚠️ OAUTH CREDENTIALS NEEDED',
+          status: process.env.GOOGLE_CLIENT_ID
+            ? '✅ CONFIGURED & WORKING'
+            : '⚠️ OAUTH CREDENTIALS NEEDED',
           implementation: 'ACTUAL API INTEGRATION',
           features: [
             '✅ Secure user authentication',
@@ -241,7 +250,8 @@ export class AppService {
         },
       },
       assignmentFulfillment: {
-        requirement: 'Integrate with at least a couple of free, relevant third-party APIs',
+        requirement:
+          'Integrate with at least a couple of free, relevant third-party APIs',
         status: '✅ EXCEEDED - 4 APIs integrated',
         apis: [
           '✅ Google Gemini 2.0 API (AI)',
@@ -271,15 +281,22 @@ export class AppService {
           message: process.env.GEMINI_API_KEY
             ? 'API key configured - ready for AI content generation'
             : 'Add GEMINI_API_KEY to environment variables',
-          endpoint: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp',
+          endpoint:
+            'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp',
         },
         googleCalendar: {
           name: 'Google Calendar API',
-          configured: !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET),
-          status: (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) ? 'working' : 'not_configured',
-          message: (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET)
-            ? 'OAuth credentials configured - ready for calendar management'
-            : 'Add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET to environment variables',
+          configured: !!(
+            process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+          ),
+          status:
+            process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+              ? 'working'
+              : 'not_configured',
+          message:
+            process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+              ? 'OAuth credentials configured - ready for calendar management'
+              : 'Add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET to environment variables',
           endpoint: 'https://www.googleapis.com/calendar/v3',
         },
         sendgridEmail: {
@@ -293,11 +310,17 @@ export class AppService {
         },
         googleOAuth: {
           name: 'Google OAuth 2.0',
-          configured: !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET),
-          status: (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) ? 'working' : 'not_configured',
-          message: (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET)
-            ? 'OAuth credentials configured - ready for authentication'
-            : 'Add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET to environment variables',
+          configured: !!(
+            process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+          ),
+          status:
+            process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+              ? 'working'
+              : 'not_configured',
+          message:
+            process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+              ? 'OAuth credentials configured - ready for authentication'
+              : 'Add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET to environment variables',
           endpoint: 'https://accounts.google.com/o/oauth2/v2/auth',
         },
       },

@@ -115,7 +115,7 @@ describe('Task Entity', () => {
       task.addTag('important');
       task.addTag('important');
 
-      expect(task.tags.filter(tag => tag === 'important')).toHaveLength(1);
+      expect(task.tags.filter((tag) => tag === 'important')).toHaveLength(1);
     });
   });
 

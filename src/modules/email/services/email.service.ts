@@ -24,13 +24,16 @@ export class EmailService {
   async sendTemplateEmail(templateData: any): Promise<any> {
     try {
       const template = this.getEmailTemplate(templateData.templateName);
-      
+
       if (!template) {
         throw new Error(`Template '${templateData.templateName}' not found`);
       }
 
-      const processedTemplate = this.processTemplate(template, templateData.variables || {});
-      
+      const processedTemplate = this.processTemplate(
+        template,
+        templateData.variables || {},
+      );
+
       const emailData = {
         to: templateData.to,
         from: templateData.from,
@@ -102,13 +105,22 @@ export class EmailService {
     let processedText = template.text;
     let processedHtml = template.html;
 
-    Object.keys(variables).forEach(key => {
+    Object.keys(variables).forEach((key) => {
       const placeholder = `{{${key}}}`;
       const value = variables[key] || '';
-      
-      processedSubject = processedSubject.replace(new RegExp(placeholder, 'g'), value);
-      processedText = processedText.replace(new RegExp(placeholder, 'g'), value);
-      processedHtml = processedHtml.replace(new RegExp(placeholder, 'g'), value);
+
+      processedSubject = processedSubject.replace(
+        new RegExp(placeholder, 'g'),
+        value,
+      );
+      processedText = processedText.replace(
+        new RegExp(placeholder, 'g'),
+        value,
+      );
+      processedHtml = processedHtml.replace(
+        new RegExp(placeholder, 'g'),
+        value,
+      );
     });
 
     return {

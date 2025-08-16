@@ -5,11 +5,11 @@
 
 import { AggregateRoot } from '../common/aggregate-root';
 import { Priority, TaskStatus, Email } from '../common/value-objects';
-import { 
-  TaskCreatedEvent, 
-  TaskUpdatedEvent, 
-  TaskCompletedEvent, 
-  TaskPriorityChangedEvent 
+import {
+  TaskCreatedEvent,
+  TaskUpdatedEvent,
+  TaskCompletedEvent,
+  TaskPriorityChangedEvent,
 } from '../common/domain-events';
 
 export interface TaskProps {
@@ -105,12 +105,16 @@ export class Task extends AggregateRoot {
     // Add urgency based on due date
     if (this._dueDate) {
       const daysUntilDue = Math.ceil(
-        (this._dueDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
+        (this._dueDate.getTime() - new Date().getTime()) /
+          (1000 * 60 * 60 * 24),
       );
-      
-      if (daysUntilDue <= 0) score += 50; // Overdue
-      else if (daysUntilDue <= 1) score += 30; // Due today/tomorrow
-      else if (daysUntilDue <= 3) score += 15; // Due this week
+
+      if (daysUntilDue <= 0)
+        score += 50; // Overdue
+      else if (daysUntilDue <= 1)
+        score += 30; // Due today/tomorrow
+      else if (daysUntilDue <= 3)
+        score += 15; // Due this week
       else if (daysUntilDue <= 7) score += 5; // Due next week
     }
 
@@ -130,11 +134,13 @@ export class Task extends AggregateRoot {
     this._title = newTitle.trim();
     this.markAsUpdated();
 
-    this.addDomainEvent(new TaskUpdatedEvent(this.id, { 
-      field: 'title', 
-      oldValue: oldTitle, 
-      newValue: this._title 
-    }));
+    this.addDomainEvent(
+      new TaskUpdatedEvent(this.id, {
+        field: 'title',
+        oldValue: oldTitle,
+        newValue: this._title,
+      }),
+    );
   }
 
   public updateDescription(description?: string): void {
@@ -142,11 +148,13 @@ export class Task extends AggregateRoot {
     this._description = description?.trim();
     this.markAsUpdated();
 
-    this.addDomainEvent(new TaskUpdatedEvent(this.id, { 
-      field: 'description', 
-      oldValue: oldDescription, 
-      newValue: this._description 
-    }));
+    this.addDomainEvent(
+      new TaskUpdatedEvent(this.id, {
+        field: 'description',
+        oldValue: oldDescription,
+        newValue: this._description,
+      }),
+    );
   }
 
   public changePriority(newPriority: Priority): void {
@@ -158,11 +166,13 @@ export class Task extends AggregateRoot {
     this._priority = newPriority;
     this.markAsUpdated();
 
-    this.addDomainEvent(new TaskPriorityChangedEvent(
-      this.id, 
-      oldPriority.value, 
-      newPriority.value
-    ));
+    this.addDomainEvent(
+      new TaskPriorityChangedEvent(
+        this.id,
+        oldPriority.value,
+        newPriority.value,
+      ),
+    );
   }
 
   public changeStatus(newStatus: TaskStatus): void {
@@ -180,21 +190,25 @@ export class Task extends AggregateRoot {
       this.addDomainEvent(new TaskCompletedEvent(this.id, this._completedAt));
     }
 
-    this.addDomainEvent(new TaskUpdatedEvent(this.id, { 
-      field: 'status', 
-      oldValue: oldStatus.value, 
-      newValue: newStatus.value 
-    }));
+    this.addDomainEvent(
+      new TaskUpdatedEvent(this.id, {
+        field: 'status',
+        oldValue: oldStatus.value,
+        newValue: newStatus.value,
+      }),
+    );
   }
 
   public assignTo(assignee: Email): void {
     this._assignee = assignee;
     this.markAsUpdated();
 
-    this.addDomainEvent(new TaskUpdatedEvent(this.id, { 
-      field: 'assignee', 
-      newValue: assignee.value 
-    }));
+    this.addDomainEvent(
+      new TaskUpdatedEvent(this.id, {
+        field: 'assignee',
+        newValue: assignee.value,
+      }),
+    );
   }
 
   public setDueDate(dueDate: Date): void {
@@ -205,10 +219,12 @@ export class Task extends AggregateRoot {
     this._dueDate = new Date(dueDate);
     this.markAsUpdated();
 
-    this.addDomainEvent(new TaskUpdatedEvent(this.id, { 
-      field: 'dueDate', 
-      newValue: this._dueDate.toISOString() 
-    }));
+    this.addDomainEvent(
+      new TaskUpdatedEvent(this.id, {
+        field: 'dueDate',
+        newValue: this._dueDate.toISOString(),
+      }),
+    );
   }
 
   public addTag(tag: string): void {
@@ -220,17 +236,19 @@ export class Task extends AggregateRoot {
     this._tags.push(normalizedTag);
     this.markAsUpdated();
 
-    this.addDomainEvent(new TaskUpdatedEvent(this.id, { 
-      field: 'tags', 
-      action: 'added', 
-      value: normalizedTag 
-    }));
+    this.addDomainEvent(
+      new TaskUpdatedEvent(this.id, {
+        field: 'tags',
+        action: 'added',
+        value: normalizedTag,
+      }),
+    );
   }
 
   public removeTag(tag: string): void {
     const normalizedTag = tag.trim().toLowerCase();
     const index = this._tags.indexOf(normalizedTag);
-    
+
     if (index === -1) {
       return;
     }
@@ -238,11 +256,13 @@ export class Task extends AggregateRoot {
     this._tags.splice(index, 1);
     this.markAsUpdated();
 
-    this.addDomainEvent(new TaskUpdatedEvent(this.id, { 
-      field: 'tags', 
-      action: 'removed', 
-      value: normalizedTag 
-    }));
+    this.addDomainEvent(
+      new TaskUpdatedEvent(this.id, {
+        field: 'tags',
+        action: 'removed',
+        value: normalizedTag,
+      }),
+    );
   }
 
   public setEstimatedDuration(minutes: number): void {
@@ -253,10 +273,12 @@ export class Task extends AggregateRoot {
     this._estimatedDuration = minutes;
     this.markAsUpdated();
 
-    this.addDomainEvent(new TaskUpdatedEvent(this.id, { 
-      field: 'estimatedDuration', 
-      newValue: minutes 
-    }));
+    this.addDomainEvent(
+      new TaskUpdatedEvent(this.id, {
+        field: 'estimatedDuration',
+        newValue: minutes,
+      }),
+    );
   }
 
   public addDependency(taskId: string): void {
@@ -268,11 +290,13 @@ export class Task extends AggregateRoot {
       this._dependencies.push(taskId);
       this.markAsUpdated();
 
-      this.addDomainEvent(new TaskUpdatedEvent(this.id, { 
-        field: 'dependencies', 
-        action: 'added', 
-        value: taskId 
-      }));
+      this.addDomainEvent(
+        new TaskUpdatedEvent(this.id, {
+          field: 'dependencies',
+          action: 'added',
+          value: taskId,
+        }),
+      );
     }
   }
 
@@ -282,11 +306,13 @@ export class Task extends AggregateRoot {
       this._dependencies.splice(index, 1);
       this.markAsUpdated();
 
-      this.addDomainEvent(new TaskUpdatedEvent(this.id, { 
-        field: 'dependencies', 
-        action: 'removed', 
-        value: taskId 
-      }));
+      this.addDomainEvent(
+        new TaskUpdatedEvent(this.id, {
+          field: 'dependencies',
+          action: 'removed',
+          value: taskId,
+        }),
+      );
     }
   }
 
@@ -309,11 +335,13 @@ export class Task extends AggregateRoot {
   }
 
   // Factory method for creating tasks
-  public static create(props: Omit<TaskProps, 'status' | 'priority' | 'assignee'> & {
-    status?: string;
-    priority?: string;
-    assignee?: string;
-  }): Task {
+  public static create(
+    props: Omit<TaskProps, 'status' | 'priority' | 'assignee'> & {
+      status?: string;
+      priority?: string;
+      assignee?: string;
+    },
+  ): Task {
     const id = `task_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
     const taskProps: TaskProps = {

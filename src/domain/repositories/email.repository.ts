@@ -3,7 +3,12 @@
  * Contract for email data persistence
  */
 
-import { Repository, ReadRepository, QueryOptions, QueryResult } from '../common/repository.interface';
+import {
+  Repository,
+  ReadRepository,
+  QueryOptions,
+  QueryResult,
+} from '../common/repository.interface';
 import { EmailMessage } from '../entities/email.entity';
 
 export interface EmailFilters {
@@ -25,7 +30,9 @@ export interface EmailQueryOptions extends QueryOptions {
 }
 
 export interface EmailRepository extends Repository<EmailMessage> {
-  findByStatus(status: 'draft' | 'scheduled' | 'sending' | 'sent' | 'failed' | 'cancelled'): Promise<EmailMessage[]>;
+  findByStatus(
+    status: 'draft' | 'scheduled' | 'sending' | 'sent' | 'failed' | 'cancelled',
+  ): Promise<EmailMessage[]>;
   findBySender(senderEmail: string): Promise<EmailMessage[]>;
   findByRecipient(recipientEmail: string): Promise<EmailMessage[]>;
   findScheduledEmails(): Promise<EmailMessage[]>;
@@ -46,7 +53,9 @@ export interface EmailRepository extends Repository<EmailMessage> {
 }
 
 export interface EmailReadRepository extends ReadRepository<EmailMessage> {
-  findByStatus(status: 'draft' | 'scheduled' | 'sending' | 'sent' | 'failed' | 'cancelled'): Promise<EmailMessage[]>;
+  findByStatus(
+    status: 'draft' | 'scheduled' | 'sending' | 'sent' | 'failed' | 'cancelled',
+  ): Promise<EmailMessage[]>;
   findBySender(senderEmail: string): Promise<EmailMessage[]>;
   findByRecipient(recipientEmail: string): Promise<EmailMessage[]>;
   findScheduledEmails(): Promise<EmailMessage[]>;

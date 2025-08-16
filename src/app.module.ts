@@ -56,7 +56,9 @@ export class AppModule implements OnModuleInit {
     const environment = this.configService.get('NODE_ENV', 'development');
     const port = this.configService.get('PORT', 3000);
 
-    this.logger.log(`🚀 ${appName} v${appVersion} starting in ${environment} mode`);
+    this.logger.log(
+      `🚀 ${appName} v${appVersion} starting in ${environment} mode`,
+    );
     this.logger.log(`📡 Server will be available on port ${port}`);
 
     // Log feature status
@@ -72,7 +74,7 @@ export class AppModule implements OnModuleInit {
       emailAutomation: !!this.configService.get('SENDGRID_API_KEY'),
       taskManagement: true,
       proactiveAutomation: true,
-      analytics: true
+      analytics: true,
     };
 
     this.logger.log('🎛️  Feature Status:', JSON.stringify(features, null, 2));
@@ -92,10 +94,10 @@ export class AppModule implements OnModuleInit {
         uptime: `${Math.floor(uptime / 60)} minutes`,
         memory: {
           used: `${Math.round(memoryUsage.heapUsed / 1024 / 1024)} MB`,
-          total: `${Math.round(memoryUsage.heapTotal / 1024 / 1024)} MB`
+          total: `${Math.round(memoryUsage.heapTotal / 1024 / 1024)} MB`,
         },
-        timestamp: new Date().toISOString()
-      }
+        timestamp: new Date().toISOString(),
+      },
     };
   }
 }

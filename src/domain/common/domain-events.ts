@@ -18,7 +18,11 @@ export abstract class BaseDomainEvent implements DomainEvent {
   public readonly occurredOn: Date;
   public readonly eventData: Record<string, any>;
 
-  constructor(aggregateId: string, eventType: string, eventData: Record<string, any> = {}) {
+  constructor(
+    aggregateId: string,
+    eventType: string,
+    eventData: Record<string, any> = {},
+  ) {
     this.eventId = this.generateEventId();
     this.aggregateId = aggregateId;
     this.eventType = eventType;
@@ -71,9 +75,9 @@ export class MeetingCancelledEvent extends BaseDomainEvent {
 
 export class MeetingReminderSentEvent extends BaseDomainEvent {
   constructor(meetingId: string, reminderType: string, sentAt: Date) {
-    super(meetingId, 'MeetingReminderSent', { 
-      reminderType, 
-      sentAt: sentAt.toISOString() 
+    super(meetingId, 'MeetingReminderSent', {
+      reminderType,
+      sentAt: sentAt.toISOString(),
     });
   }
 }
@@ -93,7 +97,11 @@ export class EmailFailedEvent extends BaseDomainEvent {
 
 // Automation Domain Events
 export class AutomationTriggeredEvent extends BaseDomainEvent {
-  constructor(automationId: string, triggerType: string, context: Record<string, any>) {
+  constructor(
+    automationId: string,
+    triggerType: string,
+    context: Record<string, any>,
+  ) {
     super(automationId, 'AutomationTriggered', { triggerType, context });
   }
 }
@@ -105,20 +113,32 @@ export class AutomationCompletedEvent extends BaseDomainEvent {
 }
 
 export class AutomationFailedEvent extends BaseDomainEvent {
-  constructor(automationId: string, error: string, context: Record<string, any>) {
+  constructor(
+    automationId: string,
+    error: string,
+    context: Record<string, any>,
+  ) {
     super(automationId, 'AutomationFailed', { error, context });
   }
 }
 
 // AI Assistant Domain Events
 export class AssistantRequestProcessedEvent extends BaseDomainEvent {
-  constructor(requestId: string, requestData: Record<string, any>, response: Record<string, any>) {
+  constructor(
+    requestId: string,
+    requestData: Record<string, any>,
+    response: Record<string, any>,
+  ) {
     super(requestId, 'AssistantRequestProcessed', { requestData, response });
   }
 }
 
 export class AssistantActionExecutedEvent extends BaseDomainEvent {
-  constructor(actionId: string, actionType: string, result: Record<string, any>) {
+  constructor(
+    actionId: string,
+    actionType: string,
+    result: Record<string, any>,
+  ) {
     super(actionId, 'AssistantActionExecuted', { actionType, result });
   }
 }

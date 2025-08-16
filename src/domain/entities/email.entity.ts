@@ -48,7 +48,13 @@ export class EmailMessage extends AggregateRoot {
   private _scheduledAt?: Date;
   private _replyTo?: EmailAddress;
   private _tags: string[];
-  private _status: 'draft' | 'scheduled' | 'sending' | 'sent' | 'failed' | 'cancelled';
+  private _status:
+    | 'draft'
+    | 'scheduled'
+    | 'sending'
+    | 'sent'
+    | 'failed'
+    | 'cancelled';
   private _sentAt?: Date;
   private _failureReason?: string;
   private _externalId?: string; // ID from email service provider
@@ -57,7 +63,7 @@ export class EmailMessage extends AggregateRoot {
   constructor(id: string, props: EmailProps, createdAt?: Date) {
     super(id, createdAt);
     this.validateEmailProps(props);
-    
+
     this._subject = props.subject;
     this._body = props.body;
     this._sender = props.sender;
@@ -122,7 +128,13 @@ export class EmailMessage extends AggregateRoot {
     return [...this._tags];
   }
 
-  get status(): 'draft' | 'scheduled' | 'sending' | 'sent' | 'failed' | 'cancelled' {
+  get status():
+    | 'draft'
+    | 'scheduled'
+    | 'sending'
+    | 'sent'
+    | 'failed'
+    | 'cancelled' {
     return this._status;
   }
 
@@ -138,12 +150,20 @@ export class EmailMessage extends AggregateRoot {
     return this._externalId;
   }
 
-  get deliveryStatus(): 'delivered' | 'bounced' | 'spam' | 'unknown' | undefined {
+  get deliveryStatus():
+    | 'delivered'
+    | 'bounced'
+    | 'spam'
+    | 'unknown'
+    | undefined {
     return this._deliveryStatus;
   }
 
   get totalAttachmentSize(): number {
-    return this._attachments.reduce((total, attachment) => total + attachment.size, 0);
+    return this._attachments.reduce(
+      (total, attachment) => total + attachment.size,
+      0,
+    );
   }
 
   get recipientCount(): number {
@@ -180,13 +200,16 @@ export class EmailMessage extends AggregateRoot {
       throw new Error('Email must have at least one recipient');
     }
 
-    const toRecipients = props.recipients.filter(r => r.type === 'to');
+    const toRecipients = props.recipients.filter((r) => r.type === 'to');
     if (toRecipients.length === 0) {
       throw new Error('Email must have at least one "to" recipient');
     }
 
     // Validate attachment size (max 25MB total)
-    const totalSize = (props.attachments || []).reduce((total, att) => total + att.size, 0);
+    const totalSize = (props.attachments || []).reduce(
+      (total, att) => total + att.size,
+      0,
+    );
     if (totalSize > 25 * 1024 * 1024) {
       throw new Error('Total attachment size cannot exceed 25MB');
     }
@@ -228,11 +251,13 @@ export class EmailMessage extends AggregateRoot {
     }
 
     const existingRecipient = this._recipients.find(
-      r => r.email.equals(recipient.email) && r.type === recipient.type
+      (r) => r.email.equals(recipient.email) && r.type === recipient.type,
     );
 
     if (existingRecipient) {
-      throw new Error(`Recipient ${recipient.email.value} already exists as ${recipient.type}`);
+      throw new Error(
+        `Recipient ${recipient.email.value} already exists as ${recipient.type}`,
+      );
     }
 
     this._recipients.push(recipient);
@@ -245,7 +270,7 @@ export class EmailMessage extends AggregateRoot {
     }
 
     const index = this._recipients.findIndex(
-      r => r.email.equals(email) && r.type === type
+      (r) => r.email.equals(email) && r.type === type,
     );
 
     if (index !== -1) {
@@ -253,7 +278,7 @@ export class EmailMessage extends AggregateRoot {
       this.markAsUpdated();
 
       // Ensure at least one "to" recipient remains
-      const toRecipients = this._recipients.filter(r => r.type === 'to');
+      const toRecipients = this._recipients.filter((r) => r.type === 'to');
       if (toRecipients.length === 0) {
         throw new Error('Email must have at least one "to" recipient');
       }
@@ -279,7 +304,7 @@ export class EmailMessage extends AggregateRoot {
       throw new Error('Cannot remove attachments from non-draft email');
     }
 
-    const index = this._attachments.findIndex(a => a.filename === filename);
+    const index = this._attachments.findIndex((a) => a.filename === filename);
     if (index !== -1) {
       this._attachments.splice(index, 1);
       this.markAsUpdated();
@@ -353,7 +378,9 @@ export class EmailMessage extends AggregateRoot {
     this.markAsUpdated();
   }
 
-  public updateDeliveryStatus(status: 'delivered' | 'bounced' | 'spam' | 'unknown'): void {
+  public updateDeliveryStatus(
+    status: 'delivered' | 'bounced' | 'spam' | 'unknown',
+  ): void {
     if (this._status !== 'sent') {
       throw new Error('Can only update delivery status of sent emails');
     }
@@ -375,7 +402,7 @@ export class EmailMessage extends AggregateRoot {
   public removeTag(tag: string): void {
     const normalizedTag = tag.trim().toLowerCase();
     const index = this._tags.indexOf(normalizedTag);
-    
+
     if (index !== -1) {
       this._tags.splice(index, 1);
       this.markAsUpdated();
@@ -388,12 +415,12 @@ export class EmailMessage extends AggregateRoot {
       subject: this._subject,
       body: this._body,
       sender: this._sender.toJSON(),
-      recipients: this._recipients.map(r => ({
+      recipients: this._recipients.map((r) => ({
         email: r.email.toJSON(),
         name: r.name,
         type: r.type,
       })),
-      attachments: this._attachments.map(a => ({
+      attachments: this._attachments.map((a) => ({
         filename: a.filename,
         contentType: a.contentType,
         size: a.size,
@@ -418,16 +445,18 @@ export class EmailMessage extends AggregateRoot {
   }
 
   // Factory method
-  public static create(props: Omit<EmailProps, 'sender' | 'recipients'> & {
-    sender: string;
-    recipients: Array<Omit<EmailRecipient, 'email'> & { email: string }>;
-  }): EmailMessage {
+  public static create(
+    props: Omit<EmailProps, 'sender' | 'recipients'> & {
+      sender: string;
+      recipients: Array<Omit<EmailRecipient, 'email'> & { email: string }>;
+    },
+  ): EmailMessage {
     const id = `email_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
+
     const emailProps: EmailProps = {
       ...props,
       sender: new EmailAddress(props.sender),
-      recipients: props.recipients.map(r => ({
+      recipients: props.recipients.map((r) => ({
         ...r,
         email: new EmailAddress(r.email),
       })),

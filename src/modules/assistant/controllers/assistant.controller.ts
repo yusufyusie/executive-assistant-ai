@@ -14,7 +14,11 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 
-import { AIAssistantService, AssistantRequest, AssistantResponse } from '../../../application/services/ai-assistant.service';
+import {
+  AIAssistantService,
+  AssistantRequest,
+  AssistantResponse,
+} from '../../../application/services/ai-assistant.service';
 
 // DTOs for request/response
 export class ProcessRequestDto {
@@ -32,7 +36,9 @@ export class AssistantController {
 
   @Post('process')
   @HttpCode(HttpStatus.OK)
-  async processRequest(@Body(ValidationPipe) request: ProcessRequestDto): Promise<AssistantResponse> {
+  async processRequest(
+    @Body(ValidationPipe) request: ProcessRequestDto,
+  ): Promise<AssistantResponse> {
     const result = await this.aiAssistantService.processRequest(request);
 
     if (result.isFailure) {

@@ -58,7 +58,9 @@ export class Priority extends ValueObject {
   private validatePriority(priority: string): void {
     const validPriorities = ['low', 'medium', 'high', 'urgent'];
     if (!validPriorities.includes(priority)) {
-      throw new Error(`Invalid priority: ${priority}. Must be one of: ${validPriorities.join(', ')}`);
+      throw new Error(
+        `Invalid priority: ${priority}. Must be one of: ${validPriorities.join(', ')}`,
+      );
     }
   }
 
@@ -72,12 +74,20 @@ export class Priority extends ValueObject {
 }
 
 export class TaskStatus extends ValueObject {
-  private readonly _value: 'pending' | 'in-progress' | 'completed' | 'cancelled';
+  private readonly _value:
+    | 'pending'
+    | 'in-progress'
+    | 'completed'
+    | 'cancelled';
 
   constructor(status: string) {
     super();
     this.validateStatus(status);
-    this._value = status as 'pending' | 'in-progress' | 'completed' | 'cancelled';
+    this._value = status as
+      | 'pending'
+      | 'in-progress'
+      | 'completed'
+      | 'cancelled';
   }
 
   get value(): 'pending' | 'in-progress' | 'completed' | 'cancelled' {
@@ -95,7 +105,9 @@ export class TaskStatus extends ValueObject {
   private validateStatus(status: string): void {
     const validStatuses = ['pending', 'in-progress', 'completed', 'cancelled'];
     if (!validStatuses.includes(status)) {
-      throw new Error(`Invalid status: ${status}. Must be one of: ${validStatuses.join(', ')}`);
+      throw new Error(
+        `Invalid status: ${status}. Must be one of: ${validStatuses.join(', ')}`,
+      );
     }
   }
 
@@ -104,10 +116,10 @@ export class TaskStatus extends ValueObject {
   }
 
   public toJSON(): Record<string, any> {
-    return { 
-      status: this._value, 
-      isCompleted: this.isCompleted, 
-      isActive: this.isActive 
+    return {
+      status: this._value,
+      isCompleted: this.isCompleted,
+      isActive: this.isActive,
     };
   }
 }
@@ -132,7 +144,9 @@ export class DateRange extends ValueObject {
   }
 
   get durationInMinutes(): number {
-    return Math.floor((this._endDate.getTime() - this._startDate.getTime()) / (1000 * 60));
+    return Math.floor(
+      (this._endDate.getTime() - this._startDate.getTime()) / (1000 * 60),
+    );
   }
 
   private validateDateRange(startDate: Date, endDate: Date): void {
@@ -150,9 +164,11 @@ export class DateRange extends ValueObject {
   }
 
   public equals(other: DateRange): boolean {
-    return other instanceof DateRange && 
-           this._startDate.getTime() === other._startDate.getTime() &&
-           this._endDate.getTime() === other._endDate.getTime();
+    return (
+      other instanceof DateRange &&
+      this._startDate.getTime() === other._startDate.getTime() &&
+      this._endDate.getTime() === other._endDate.getTime()
+    );
   }
 
   public toJSON(): Record<string, any> {

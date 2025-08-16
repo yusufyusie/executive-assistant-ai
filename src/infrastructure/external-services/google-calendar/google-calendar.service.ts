@@ -69,11 +69,13 @@ export class GoogleCalendarService {
     const clientId = this.config.get('GOOGLE_CLIENT_ID');
     const clientSecret = this.config.get('GOOGLE_CLIENT_SECRET');
     this.isConfigured = !!(clientId && clientSecret);
-    
+
     if (this.isConfigured) {
       this.logger.log('Google Calendar service configured successfully');
     } else {
-      this.logger.warn('Google Calendar credentials not found, using mock responses');
+      this.logger.warn(
+        'Google Calendar credentials not found, using mock responses',
+      );
     }
   }
 
@@ -114,7 +116,7 @@ export class GoogleCalendarService {
           dateTime: event.end,
           timeZone: 'America/New_York',
         },
-        attendees: event.attendees?.map(email => ({ email })),
+        attendees: event.attendees?.map((email) => ({ email })),
         location: event.location,
         reminders: {
           useDefault: false,
@@ -125,24 +127,31 @@ export class GoogleCalendarService {
         },
       };
 
-      const response = await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `https://www.googleapis.com/calendar/v3/calendars/primary/events`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(calendarEvent),
         },
-        body: JSON.stringify(calendarEvent),
-      });
+      );
 
       if (!response.ok) {
         const errorText = await response.text();
-        this.logger.error(`Calendar API error: ${response.status} ${errorText}`);
+        this.logger.error(
+          `Calendar API error: ${response.status} ${errorText}`,
+        );
         throw new Error(`Calendar API error: ${response.status}`);
       }
 
       const createdEvent = await response.json();
 
-      this.logger.log(`Calendar event created successfully: ${createdEvent.id}`);
+      this.logger.log(
+        `Calendar event created successfully: ${createdEvent.id}`,
+      );
 
       return {
         id: createdEvent.id,
@@ -156,13 +165,13 @@ export class GoogleCalendarService {
           dateTime: createdEvent.end.dateTime,
           timeZone: createdEvent.end.timeZone || 'UTC',
         },
-        attendees: createdEvent.attendees?.map((a: any) => ({
-          email: a.email,
-          responseStatus: a.responseStatus || 'needsAction',
-        })) || [],
+        attendees:
+          createdEvent.attendees?.map((a: any) => ({
+            email: a.email,
+            responseStatus: a.responseStatus || 'needsAction',
+          })) || [],
         location: createdEvent.location,
       };
-
     } catch (error) {
       this.logger.error('Failed to create calendar event', error.stack);
       // Fallback to mock response for demo purposes
@@ -197,14 +206,16 @@ export class GoogleCalendarService {
 
       const data = await response.json();
       return data.access_token;
-
     } catch (error) {
       this.logger.error('Failed to refresh access token', error.stack);
       throw new Error('Authentication failed');
     }
   }
 
-  async updateEvent(eventId: string, event: Partial<CalendarEvent>): Promise<CalendarEvent> {
+  async updateEvent(
+    eventId: string,
+    event: Partial<CalendarEvent>,
+  ): Promise<CalendarEvent> {
     if (!this.isConfigured) {
       return this.getMockUpdatedEvent(eventId, event);
     }
@@ -237,14 +248,19 @@ export class GoogleCalendarService {
   async checkAvailability(
     date: string,
     duration: number = 60,
-    workingHours: { start: string; end: string } = { start: '09:00', end: '17:00' }
+    workingHours: { start: string; end: string } = {
+      start: '09:00',
+      end: '17:00',
+    },
   ): Promise<AvailabilityResponse> {
     if (!this.isConfigured) {
       return this.getMockAvailability(date, duration, workingHours);
     }
 
     try {
-      this.logger.log(`Checking availability for ${date}, duration: ${duration}min`);
+      this.logger.log(
+        `Checking availability for ${date}, duration: ${duration}min`,
+      );
       // In a real implementation, this would call the Google Calendar API
       return this.getMockAvailability(date, duration, workingHours);
     } catch (error) {
@@ -257,18 +273,22 @@ export class GoogleCalendarService {
     startDate: string,
     endDate: string,
     duration: number,
-    attendees: string[] = []
-  ): Promise<Array<{
-    start: string;
-    end: string;
-    attendeeAvailability: Record<string, boolean>;
-  }>> {
+    attendees: string[] = [],
+  ): Promise<
+    Array<{
+      start: string;
+      end: string;
+      attendeeAvailability: Record<string, boolean>;
+    }>
+  > {
     if (!this.isConfigured) {
       return this.getMockMeetingSlots(startDate, endDate, duration, attendees);
     }
 
     try {
-      this.logger.log(`Finding meeting slots from ${startDate} to ${endDate}, duration: ${duration}min`);
+      this.logger.log(
+        `Finding meeting slots from ${startDate} to ${endDate}, duration: ${duration}min`,
+      );
       // In a real implementation, this would call the Google Calendar API
       return this.getMockMeetingSlots(startDate, endDate, duration, attendees);
     } catch (error) {
@@ -291,7 +311,7 @@ export class GoogleCalendarService {
 
   private getMockEvents(date?: string): CalendarEvent[] {
     const targetDate = date || new Date().toISOString().split('T')[0];
-    
+
     return [
       {
         id: 'mock_event_1',
@@ -359,14 +379,17 @@ export class GoogleCalendarService {
     return {
       ...event,
       id: `mock_event_${Date.now()}`,
-      attendees: event.attendees?.map(attendee => ({
+      attendees: event.attendees?.map((attendee) => ({
         ...attendee,
         responseStatus: 'needsAction' as const,
       })),
     };
   }
 
-  private getMockUpdatedEvent(eventId: string, updates: Partial<CalendarEvent>): CalendarEvent {
+  private getMockUpdatedEvent(
+    eventId: string,
+    updates: Partial<CalendarEvent>,
+  ): CalendarEvent {
     return {
       id: eventId,
       summary: updates.summary || 'Updated Event',
@@ -387,7 +410,7 @@ export class GoogleCalendarService {
   private getMockAvailability(
     date: string,
     duration: number,
-    workingHours: { start: string; end: string }
+    workingHours: { start: string; end: string },
   ): AvailabilityResponse {
     const availableSlots: AvailabilitySlot[] = [];
     const busySlots: AvailabilitySlot[] = [];
@@ -403,20 +426,20 @@ export class GoogleCalendarService {
         start: `${date}T14:00:00Z`,
         end: `${date}T15:30:00Z`,
         duration: 90,
-      }
+      },
     );
 
     // Generate available slots
     const workStart = new Date(`${date}T${workingHours.start}:00Z`);
     const workEnd = new Date(`${date}T${workingHours.end}:00Z`);
-    
+
     let current = new Date(workStart);
     while (current < workEnd) {
       const slotEnd = new Date(current.getTime() + duration * 60 * 1000);
-      
+
       if (slotEnd <= workEnd) {
         // Check if this slot conflicts with busy periods
-        const hasConflict = busySlots.some(busy => {
+        const hasConflict = busySlots.some((busy) => {
           const busyStart = new Date(busy.start);
           const busyEnd = new Date(busy.end);
           return current < busyEnd && slotEnd > busyStart;
@@ -430,7 +453,7 @@ export class GoogleCalendarService {
           });
         }
       }
-      
+
       current = new Date(current.getTime() + 30 * 60 * 1000); // 30-minute increments
     }
 
@@ -446,7 +469,7 @@ export class GoogleCalendarService {
     startDate: string,
     endDate: string,
     duration: number,
-    attendees: string[]
+    attendees: string[],
   ): Array<{
     start: string;
     end: string;
@@ -459,45 +482,49 @@ export class GoogleCalendarService {
     }> = [];
     const start = new Date(startDate);
     const end = new Date(endDate);
-    
+
     // Generate mock slots for the next few days
     for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
       // Skip weekends
       if (d.getDay() === 0 || d.getDay() === 6) continue;
-      
+
       // Morning slot
       const morningStart = new Date(d);
       morningStart.setHours(10, 0, 0, 0);
-      const morningEnd = new Date(morningStart.getTime() + duration * 60 * 1000);
-      
+      const morningEnd = new Date(
+        morningStart.getTime() + duration * 60 * 1000,
+      );
+
       const attendeeAvailability: Record<string, boolean> = {};
-      attendees.forEach(email => {
+      attendees.forEach((email) => {
         attendeeAvailability[email] = Math.random() > 0.3; // 70% chance of availability
       });
-      
+
       slots.push({
         start: morningStart.toISOString(),
         end: morningEnd.toISOString(),
         attendeeAvailability,
       });
-      
+
       // Afternoon slot
       const afternoonStart = new Date(d);
       afternoonStart.setHours(14, 0, 0, 0);
-      const afternoonEnd = new Date(afternoonStart.getTime() + duration * 60 * 1000);
-      
+      const afternoonEnd = new Date(
+        afternoonStart.getTime() + duration * 60 * 1000,
+      );
+
       const afternoonAvailability: Record<string, boolean> = {};
-      attendees.forEach(email => {
+      attendees.forEach((email) => {
         afternoonAvailability[email] = Math.random() > 0.4; // 60% chance of availability
       });
-      
+
       slots.push({
         start: afternoonStart.toISOString(),
         end: afternoonEnd.toISOString(),
         attendeeAvailability: afternoonAvailability,
       });
     }
-    
+
     return slots.slice(0, 10); // Return top 10 slots
   }
 }

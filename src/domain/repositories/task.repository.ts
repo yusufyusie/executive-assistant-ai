@@ -3,7 +3,12 @@
  * Contract for task data persistence
  */
 
-import { Repository, ReadRepository, QueryOptions, QueryResult } from '../common/repository.interface';
+import {
+  Repository,
+  ReadRepository,
+  QueryOptions,
+  QueryResult,
+} from '../common/repository.interface';
 import { Task } from '../entities/task.entity';
 import { Priority, TaskStatus } from '../common/value-objects';
 

@@ -19,7 +19,9 @@ export class GoogleCalendarService {
     if (this.isConfigured) {
       this.logger.log('Google Calendar service configured successfully');
     } else {
-      this.logger.warn('Google Calendar credentials not found, using mock responses');
+      this.logger.warn(
+        'Google Calendar credentials not found, using mock responses',
+      );
     }
   }
 
@@ -33,7 +35,10 @@ export class GoogleCalendarService {
       this.logger.log(`Fetching events for ${date || 'today'}`);
       return this.getMockEvents(date);
     } catch (error) {
-      this.logger.error('Failed to fetch events from Google Calendar', error.stack);
+      this.logger.error(
+        'Failed to fetch events from Google Calendar',
+        error.stack,
+      );
       return this.getMockEvents(date);
     }
   }
@@ -45,10 +50,15 @@ export class GoogleCalendarService {
 
     try {
       // In a real implementation, this would call Google Calendar API
-      this.logger.log(`Scheduling event: ${eventData.title || eventData.summary}`);
+      this.logger.log(
+        `Scheduling event: ${eventData.title || eventData.summary}`,
+      );
       return this.getMockScheduledEvent(eventData);
     } catch (error) {
-      this.logger.error('Failed to schedule event in Google Calendar', error.stack);
+      this.logger.error(
+        'Failed to schedule event in Google Calendar',
+        error.stack,
+      );
       return this.getMockScheduledEvent(eventData);
     }
   }
@@ -64,7 +74,7 @@ export class GoogleCalendarService {
 
   private getMockEvents(date?: string): any[] {
     const targetDate = date || new Date().toISOString().split('T')[0];
-    
+
     return [
       {
         id: 'mock-event-1',
@@ -97,11 +107,12 @@ export class GoogleCalendarService {
     return {
       id: `mock-${Date.now()}`,
       summary: eventData.title || eventData.summary || 'New Meeting',
-      start: { 
-        dateTime: eventData.startTime || new Date().toISOString() 
+      start: {
+        dateTime: eventData.startTime || new Date().toISOString(),
       },
-      end: { 
-        dateTime: eventData.endTime || new Date(Date.now() + 3600000).toISOString() 
+      end: {
+        dateTime:
+          eventData.endTime || new Date(Date.now() + 3600000).toISOString(),
       },
       attendees: eventData.attendees?.map((email: string) => ({ email })) || [],
       location: eventData.location || 'TBD',

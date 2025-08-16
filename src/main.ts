@@ -38,12 +38,14 @@ async function bootstrap() {
     // Swagger API Documentation
     const swaggerConfig = new DocumentBuilder()
       .setTitle('Executive Assistant AI')
-      .setDescription('AI-powered Executive Assistant automation platform with comprehensive API integrations')
+      .setDescription(
+        'AI-powered Executive Assistant automation platform with comprehensive API integrations',
+      )
       .setVersion('2.0.0')
       .setContact(
         'Executive Assistant AI Team',
         'https://github.com/your-org/executive-assistant-ai',
-        'support@yourcompany.com'
+        'support@yourcompany.com',
       )
       .addServer(`http://localhost:${port}`, 'Development Server')
       .addApiKey(
@@ -53,7 +55,7 @@ async function bootstrap() {
           in: 'header',
           description: 'API key for authentication',
         },
-        'ApiKeyAuth'
+        'ApiKeyAuth',
       )
       .addTag('Tasks', 'Task management and prioritization')
       .addTag('Assistant', 'AI assistant and natural language processing')
@@ -63,7 +65,8 @@ async function bootstrap() {
       .build();
 
     const document = SwaggerModule.createDocument(app, swaggerConfig, {
-      operationIdFactory: (controllerKey: string, methodKey: string) => methodKey,
+      operationIdFactory: (controllerKey: string, methodKey: string) =>
+        methodKey,
       deepScanRoutes: true,
     });
 
@@ -122,7 +125,6 @@ async function bootstrap() {
     logger.log(`   • POST /api/email/send       - Send emails`);
     logger.log(`   • GET  /api/tasks            - Get tasks`);
     logger.log(`   • GET  /api/automation/briefing - Daily briefing`);
-
   } catch (error) {
     logger.error('❌ Failed to start application', error.stack);
     process.exit(1);

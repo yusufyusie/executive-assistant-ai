@@ -9,7 +9,7 @@ import { UpdateTaskDto } from '../../dtos/task.dto';
 export class UpdateTaskCommand extends BaseCommand {
   constructor(
     public readonly taskId: string,
-    public readonly data: UpdateTaskDto
+    public readonly data: UpdateTaskDto,
   ) {
     super();
   }

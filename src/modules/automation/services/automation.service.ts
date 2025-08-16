@@ -34,9 +34,15 @@ export class AutomationService {
   ) {}
 
   // Convenience getters for backward compatibility
-  private get calendar() { return this.calendarService; }
-  private get task() { return this.taskService; }
-  private get email() { return this.emailService; }
+  private get calendar() {
+    return this.calendarService;
+  }
+  private get task() {
+    return this.taskService;
+  }
+  private get email() {
+    return this.emailService;
+  }
 
   // Helper method to create automation runs
   private createAutomationRun(type: string, parameters?: any): AutomationRun {
@@ -68,8 +74,8 @@ export class AutomationService {
 
   // Helper method to summarize results
   private summarizeResults(results: PromiseSettledResult<any>[]): any {
-    const successful = results.filter(r => r.status === 'fulfilled').length;
-    const failed = results.filter(r => r.status === 'rejected').length;
+    const successful = results.filter((r) => r.status === 'fulfilled').length;
+    const failed = results.filter((r) => r.status === 'rejected').length;
 
     return {
       total: results.length,
@@ -85,7 +91,9 @@ export class AutomationService {
     timeZone: 'UTC',
   })
   async dailyProactiveAutomation() {
-    const automationRun = this.createAutomationRun('daily_proactive_automation');
+    const automationRun = this.createAutomationRun(
+      'daily_proactive_automation',
+    );
 
     try {
       this.logger.log('🤖 Starting daily proactive automation...');
@@ -137,9 +145,9 @@ export class AutomationService {
 
   async triggerAutomation(request: any): Promise<any> {
     const { type, parameters } = request;
-    
+
     this.logger.log(`Triggering automation: ${type}`);
-    
+
     const automationRun: AutomationRun = {
       id: Date.now().toString(),
       type,
@@ -149,10 +157,10 @@ export class AutomationService {
     };
 
     this.automationRuns.push(automationRun);
-    
+
     try {
       let result;
-      
+
       switch (type) {
         case 'daily_briefing':
           result = await this.generateDailyBriefing(parameters?.date);
@@ -164,7 +172,10 @@ export class AutomationService {
           result = await this.sendProactiveReminders();
           break;
         case 'task_prioritization':
-          result = { action: 'prioritized', message: 'Task prioritization completed' };
+          result = {
+            action: 'prioritized',
+            message: 'Task prioritization completed',
+          };
           break;
         case 'email_follow_up':
           result = { action: 'emails_sent', message: 'Follow-up emails sent' };
@@ -172,11 +183,11 @@ export class AutomationService {
         default:
           throw new Error(`Unknown automation type: ${type}`);
       }
-      
+
       automationRun.status = 'completed';
       automationRun.endTime = new Date().toISOString();
       automationRun.result = result;
-      
+
       return {
         automationId: automationRun.id,
         type,
@@ -187,14 +198,14 @@ export class AutomationService {
       automationRun.status = 'failed';
       automationRun.endTime = new Date().toISOString();
       automationRun.error = error.message;
-      
+
       throw error;
     }
   }
 
   async generateDailyBriefing(date?: string): Promise<any> {
     const targetDate = date || new Date().toISOString().split('T')[0];
-    
+
     try {
       const events = await this.calendar.getEvents(targetDate);
       const tasksResult = await this.task.getTasks({});
@@ -204,8 +215,10 @@ export class AutomationService {
       }
 
       const tasks = tasksResult.value.items || [];
-      const urgentTasks = tasks.filter((task: any) => task.priority === 'urgent' || task.priority === 'high');
-      
+      const urgentTasks = tasks.filter(
+        (task: any) => task.priority === 'urgent' || task.priority === 'high',
+      );
+
       const briefing = {
         date: targetDate,
         summary: {
@@ -217,20 +230,28 @@ export class AutomationService {
         schedule: {
           meetings: events.slice(0, 5),
           conflicts: this.detectConflicts(events),
-          suggestions: ['Block 10-11 AM for deep work', 'Schedule lunch break at 12:30 PM'],
+          suggestions: [
+            'Block 10-11 AM for deep work',
+            'Schedule lunch break at 12:30 PM',
+          ],
         },
         tasks: {
           urgent: urgentTasks.slice(0, 3),
-          important: tasks.filter((t: any) => t.priority === 'medium').slice(0, 3),
+          important: tasks
+            .filter((t: any) => t.priority === 'medium')
+            .slice(0, 3),
         },
         insights: {
           productivity: 'Peak focus time: 9-11 AM based on calendar analysis',
-          optimization: events.length > 5 ? 'Consider consolidating meetings' : 'Good meeting balance',
+          optimization:
+            events.length > 5
+              ? 'Consider consolidating meetings'
+              : 'Good meeting balance',
           alerts: this.generateAlerts(events, tasks),
         },
         generatedAt: new Date().toISOString(),
       };
-      
+
       this.logger.log(`Daily briefing generated for ${targetDate}`);
       return briefing;
     } catch (error) {
@@ -246,7 +267,9 @@ export class AutomationService {
       type: automationData.type,
       schedule: automationData.schedule,
       status: 'scheduled',
-      nextRun: automationData.nextRun || new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+      nextRun:
+        automationData.nextRun ||
+        new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
     };
   }
 
@@ -258,14 +281,20 @@ export class AutomationService {
         { type: 'daily_briefing', schedule: '0 8 * * 1-5', status: 'active' },
         { type: 'weekly_summary', schedule: '0 9 * * 1', status: 'active' },
       ],
-      nextScheduledRun: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+      nextScheduledRun: new Date(
+        Date.now() + 24 * 60 * 60 * 1000,
+      ).toISOString(),
     };
   }
 
   async getAnalytics(): Promise<any> {
     const totalRuns = this.automationRuns.length;
-    const successfulRuns = this.automationRuns.filter(run => run.status === 'completed').length;
-    const failedRuns = this.automationRuns.filter(run => run.status === 'failed').length;
+    const successfulRuns = this.automationRuns.filter(
+      (run) => run.status === 'completed',
+    ).length;
+    const failedRuns = this.automationRuns.filter(
+      (run) => run.status === 'failed',
+    ).length;
 
     return {
       totalRuns,
@@ -283,8 +312,16 @@ export class AutomationService {
       status: 'healthy',
       automationRuns: this.automationRuns.length,
       scheduledJobs: 2,
-      features: ['daily_briefing', 'proactive_reminders', 'smart_scheduling', 'task_prioritization'],
-      lastRun: this.automationRuns.length > 0 ? this.automationRuns[this.automationRuns.length - 1].startTime : null,
+      features: [
+        'daily_briefing',
+        'proactive_reminders',
+        'smart_scheduling',
+        'task_prioritization',
+      ],
+      lastRun:
+        this.automationRuns.length > 0
+          ? this.automationRuns[this.automationRuns.length - 1].startTime
+          : null,
       timestamp: new Date().toISOString(),
     };
   }
@@ -300,10 +337,13 @@ export class AutomationService {
           timeZone: 'UTC',
         },
         end: {
-          dateTime: parameters.endTime || new Date(Date.now() + 60 * 60 * 1000).toISOString(),
+          dateTime:
+            parameters.endTime ||
+            new Date(Date.now() + 60 * 60 * 1000).toISOString(),
           timeZone: 'UTC',
         },
-        attendees: parameters.attendees?.map((email: string) => ({ email })) || [],
+        attendees:
+          parameters.attendees?.map((email: string) => ({ email })) || [],
         location: parameters.location,
       });
 
@@ -313,8 +353,6 @@ export class AutomationService {
       return { error: 'Meeting scheduling automation failed' };
     }
   }
-
-
 
   private async sendProactiveReminders(): Promise<any> {
     try {
@@ -351,11 +389,17 @@ export class AutomationService {
       const current = events[i];
       const next = events[i + 1];
 
-      const currentEnd = new Date(current.end?.dateTime || current.end?.date || new Date());
-      const nextStart = new Date(next.start?.dateTime || next.start?.date || new Date());
+      const currentEnd = new Date(
+        current.end?.dateTime || current.end?.date || new Date(),
+      );
+      const nextStart = new Date(
+        next.start?.dateTime || next.start?.date || new Date(),
+      );
 
       if (currentEnd > nextStart) {
-        conflicts.push(`Conflict between "${current.summary}" and "${next.summary}"`);
+        conflicts.push(
+          `Conflict between "${current.summary}" and "${next.summary}"`,
+        );
       }
     }
 
@@ -375,7 +419,9 @@ export class AutomationService {
     }
 
     if (events.length > 6) {
-      alerts.push('Heavy meeting day - consider rescheduling non-critical meetings');
+      alerts.push(
+        'Heavy meeting day - consider rescheduling non-critical meetings',
+      );
     }
 
     return alerts;
@@ -395,11 +441,15 @@ export class AutomationService {
   }
 
   private calculateAverageExecutionTime(): number {
-    const completedRuns = this.automationRuns.filter(run => run.status === 'completed' && run.endTime);
+    const completedRuns = this.automationRuns.filter(
+      (run) => run.status === 'completed' && run.endTime,
+    );
     if (completedRuns.length === 0) return 0;
 
     const totalTime = completedRuns.reduce((sum, run) => {
-      const duration = new Date(run.endTime || new Date()).getTime() - new Date(run.startTime).getTime();
+      const duration =
+        new Date(run.endTime || new Date()).getTime() -
+        new Date(run.startTime).getTime();
       return sum + duration;
     }, 0);
 
@@ -408,11 +458,11 @@ export class AutomationService {
 
   private getRunsByType(): Record<string, number> {
     const runsByType: Record<string, number> = {};
-    
-    this.automationRuns.forEach(run => {
+
+    this.automationRuns.forEach((run) => {
       runsByType[run.type] = (runsByType[run.type] || 0) + 1;
     });
-    
+
     return runsByType;
   }
 
@@ -420,8 +470,8 @@ export class AutomationService {
     const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
     return this.automationRuns
-      .filter(run => new Date(run.startTime) >= oneWeekAgo)
-      .map(run => ({
+      .filter((run) => new Date(run.startTime) >= oneWeekAgo)
+      .map((run) => ({
         date: run.startTime.split('T')[0],
         type: run.type,
         status: run.status,
@@ -452,7 +502,9 @@ export class AutomationService {
       }
 
       const tasks = tasksResult.value.items || [];
-      const urgentTasks = tasks.filter((task: any) => task.priority === 'urgent');
+      const urgentTasks = tasks.filter(
+        (task: any) => task.priority === 'urgent',
+      );
       const notifications: string[] = [];
 
       for (const task of urgentTasks) {
@@ -471,7 +523,8 @@ export class AutomationService {
       const events = await this.calendarService.getEvents();
       // Simple optimization logic
       const busySlots = events.length;
-      const optimization = busySlots > 5 ? 'Consider reducing meetings' : 'Schedule looks good';
+      const optimization =
+        busySlots > 5 ? 'Consider reducing meetings' : 'Schedule looks good';
 
       return { optimization, busySlots };
     } catch (error) {
@@ -488,12 +541,15 @@ export class AutomationService {
       }
 
       const tasks = tasksResult.value.items || [];
-      const completedTasks = tasks.filter((task: any) => task.status === 'completed');
+      const completedTasks = tasks.filter(
+        (task: any) => task.status === 'completed',
+      );
 
       return {
         totalTasks: tasks.length,
         completedTasks: completedTasks.length,
-        completionRate: tasks.length > 0 ? (completedTasks.length / tasks.length) * 100 : 0,
+        completionRate:
+          tasks.length > 0 ? (completedTasks.length / tasks.length) * 100 : 0,
       };
     } catch (error) {
       this.logger.warn('Failed to analyze productivity trends', error.message);
@@ -504,7 +560,7 @@ export class AutomationService {
   private async optimizeRecurringMeetings(): Promise<any> {
     try {
       const events = await this.calendarService.getEvents();
-      const recurringEvents = events.filter(event => event.recurrence);
+      const recurringEvents = events.filter((event) => event.recurrence);
 
       return {
         recurringMeetings: recurringEvents.length,

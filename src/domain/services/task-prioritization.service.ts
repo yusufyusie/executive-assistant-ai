@@ -50,18 +50,20 @@ export class TaskPrioritizationService {
 
   public prioritizeTasks(
     tasks: Task[],
-    criteria: Partial<PrioritizationCriteria> = {}
+    criteria: Partial<PrioritizationCriteria> = {},
   ): PrioritizationResult {
     const finalCriteria = { ...this.defaultCriteria, ...criteria };
-    
-    const prioritizedTasks = tasks.map(task => this.calculateTaskScore(task, finalCriteria));
-    
+
+    const prioritizedTasks = tasks.map((task) =>
+      this.calculateTaskScore(task, finalCriteria),
+    );
+
     // Sort by score (highest first)
     prioritizedTasks.sort((a, b) => b.score - a.score);
-    
+
     const summary = this.generateSummary(prioritizedTasks);
     const recommendations = this.generateRecommendations(prioritizedTasks);
-    
+
     return {
       prioritizedTasks,
       summary,
@@ -69,7 +71,10 @@ export class TaskPrioritizationService {
     };
   }
 
-  private calculateTaskScore(task: Task, criteria: PrioritizationCriteria): PrioritizedTask {
+  private calculateTaskScore(
+    task: Task,
+    criteria: PrioritizationCriteria,
+  ): PrioritizedTask {
     const factors = {
       dueDate: this.calculateDueDateScore(task),
       priority: this.calculatePriorityScore(task),
@@ -80,10 +85,10 @@ export class TaskPrioritizationService {
 
     const score = Math.round(
       factors.dueDate * criteria.dueDateWeight +
-      factors.priority * criteria.priorityWeight +
-      factors.status * criteria.statusWeight +
-      factors.dependencies * criteria.dependencyWeight +
-      factors.estimatedDuration * criteria.estimatedDurationWeight
+        factors.priority * criteria.priorityWeight +
+        factors.status * criteria.statusWeight +
+        factors.dependencies * criteria.dependencyWeight +
+        factors.estimatedDuration * criteria.estimatedDurationWeight,
     );
 
     const recommendation = this.generateTaskRecommendation(score, factors);
@@ -113,7 +118,7 @@ export class TaskPrioritizationService {
     if (daysDiff <= 7) return 50; // Due within a week
     if (daysDiff <= 14) return 30; // Due within 2 weeks
     if (daysDiff <= 30) return 20; // Due within a month
-    
+
     return 10; // Due later
   }
 
@@ -124,18 +129,18 @@ export class TaskPrioritizationService {
       medium: 50,
       low: 25,
     };
-    
+
     return priorityScores[task.priority.value];
   }
 
   private calculateStatusScore(task: Task): number {
     const statusScores = {
       'in-progress': 80,
-      'pending': 60,
-      'completed': 0,
-      'cancelled': 0,
+      pending: 60,
+      completed: 0,
+      cancelled: 0,
     };
-    
+
     return statusScores[task.status.value];
   }
 
@@ -144,7 +149,7 @@ export class TaskPrioritizationService {
     if (task.dependencies.length === 0) {
       return 80;
     }
-    
+
     // More dependencies = lower score
     const dependencyPenalty = Math.min(task.dependencies.length * 10, 60);
     return Math.max(80 - dependencyPenalty, 20);
@@ -161,7 +166,7 @@ export class TaskPrioritizationService {
     if (task.estimatedDuration <= 120) return 60; // 2 hours or less
     if (task.estimatedDuration <= 240) return 50; // 4 hours or less
     if (task.estimatedDuration <= 480) return 40; // 8 hours or less
-    
+
     return 30; // Longer tasks
   }
 
@@ -169,28 +174,34 @@ export class TaskPrioritizationService {
     if (score >= 90) {
       return 'Critical - Handle immediately';
     }
-    
+
     if (score >= 80) {
       return 'High - Schedule for today';
     }
-    
+
     if (score >= 60) {
       return 'Medium - Schedule for this week';
     }
-    
+
     if (score >= 40) {
       return 'Low - Schedule when convenient';
     }
-    
+
     return 'Defer - Consider delegating or postponing';
   }
 
-  private generateSummary(prioritizedTasks: PrioritizedTask[]): PrioritizationResult['summary'] {
+  private generateSummary(
+    prioritizedTasks: PrioritizedTask[],
+  ): PrioritizationResult['summary'] {
     const total = prioritizedTasks.length;
-    const critical = prioritizedTasks.filter(t => t.score >= 90).length;
-    const high = prioritizedTasks.filter(t => t.score >= 80 && t.score < 90).length;
-    const medium = prioritizedTasks.filter(t => t.score >= 60 && t.score < 80).length;
-    const low = prioritizedTasks.filter(t => t.score < 60).length;
+    const critical = prioritizedTasks.filter((t) => t.score >= 90).length;
+    const high = prioritizedTasks.filter(
+      (t) => t.score >= 80 && t.score < 90,
+    ).length;
+    const medium = prioritizedTasks.filter(
+      (t) => t.score >= 60 && t.score < 80,
+    ).length;
+    const low = prioritizedTasks.filter((t) => t.score < 60).length;
 
     return {
       totalTasks: total,
@@ -201,38 +212,57 @@ export class TaskPrioritizationService {
     };
   }
 
-  private generateRecommendations(prioritizedTasks: PrioritizedTask[]): string[] {
+  private generateRecommendations(
+    prioritizedTasks: PrioritizedTask[],
+  ): string[] {
     const recommendations: string[] = [];
-    
-    const criticalTasks = prioritizedTasks.filter(t => t.score >= 90);
+
+    const criticalTasks = prioritizedTasks.filter((t) => t.score >= 90);
     if (criticalTasks.length > 0) {
-      recommendations.push(`Focus on ${criticalTasks.length} critical task(s) first`);
+      recommendations.push(
+        `Focus on ${criticalTasks.length} critical task(s) first`,
+      );
     }
-    
-    const overdueTasks = prioritizedTasks.filter(t => t.task.isOverdue);
+
+    const overdueTasks = prioritizedTasks.filter((t) => t.task.isOverdue);
     if (overdueTasks.length > 0) {
-      recommendations.push(`${overdueTasks.length} task(s) are overdue and need immediate attention`);
+      recommendations.push(
+        `${overdueTasks.length} task(s) are overdue and need immediate attention`,
+      );
     }
-    
-    const inProgressTasks = prioritizedTasks.filter(t => t.task.status.value === 'in-progress');
+
+    const inProgressTasks = prioritizedTasks.filter(
+      (t) => t.task.status.value === 'in-progress',
+    );
     if (inProgressTasks.length > 3) {
-      recommendations.push('Consider focusing on completing in-progress tasks before starting new ones');
+      recommendations.push(
+        'Consider focusing on completing in-progress tasks before starting new ones',
+      );
     }
-    
-    const highPriorityTasks = prioritizedTasks.filter(t => t.task.priority.value === 'urgent' || t.task.priority.value === 'high');
+
+    const highPriorityTasks = prioritizedTasks.filter(
+      (t) =>
+        t.task.priority.value === 'urgent' || t.task.priority.value === 'high',
+    );
     if (highPriorityTasks.length > 5) {
-      recommendations.push('High number of urgent/high priority tasks - consider delegating some tasks');
+      recommendations.push(
+        'High number of urgent/high priority tasks - consider delegating some tasks',
+      );
     }
-    
-    const tasksWithoutDueDate = prioritizedTasks.filter(t => !t.task.dueDate);
+
+    const tasksWithoutDueDate = prioritizedTasks.filter((t) => !t.task.dueDate);
     if (tasksWithoutDueDate.length > 0) {
-      recommendations.push(`${tasksWithoutDueDate.length} task(s) don't have due dates - consider setting deadlines`);
+      recommendations.push(
+        `${tasksWithoutDueDate.length} task(s) don't have due dates - consider setting deadlines`,
+      );
     }
-    
+
     if (recommendations.length === 0) {
-      recommendations.push('Task priorities are well balanced. Continue with current schedule.');
+      recommendations.push(
+        'Task priorities are well balanced. Continue with current schedule.',
+      );
     }
-    
+
     return recommendations;
   }
 
@@ -258,7 +288,9 @@ export class TaskPrioritizationService {
       // Suggest priority increase
       if (urgencyScore >= 80 && currentPriority !== 'urgent') {
         suggestedPriority = 'urgent';
-        reason = task.isOverdue ? 'Task is overdue' : 'Task has high urgency score due to approaching deadline';
+        reason = task.isOverdue
+          ? 'Task is overdue'
+          : 'Task has high urgency score due to approaching deadline';
       } else if (urgencyScore >= 60 && currentPriority === 'low') {
         suggestedPriority = 'medium';
         reason = 'Task urgency has increased';
@@ -268,7 +300,10 @@ export class TaskPrioritizationService {
       }
 
       // Suggest priority decrease
-      if (urgencyScore < 30 && (currentPriority === 'urgent' || currentPriority === 'high')) {
+      if (
+        urgencyScore < 30 &&
+        (currentPriority === 'urgent' || currentPriority === 'high')
+      ) {
         suggestedPriority = 'medium';
         reason = 'Task urgency has decreased';
       } else if (urgencyScore < 20 && currentPriority === 'medium') {

@@ -14,7 +14,7 @@ export interface CommandHandler<TCommand extends Command, TResult = void> {
 
 export interface CommandBus {
   execute<TCommand extends Command, TResult = void>(
-    command: TCommand
+    command: TCommand,
   ): Promise<TResult>;
 }
 

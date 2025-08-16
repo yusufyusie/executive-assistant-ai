@@ -50,7 +50,16 @@ export interface EmailTemplate {
 
 export interface DeliveryStatus {
   messageId: string;
-  event: 'delivered' | 'bounce' | 'dropped' | 'spam_report' | 'unsubscribe' | 'group_unsubscribe' | 'group_resubscribe' | 'open' | 'click';
+  event:
+    | 'delivered'
+    | 'bounce'
+    | 'dropped'
+    | 'spam_report'
+    | 'unsubscribe'
+    | 'group_unsubscribe'
+    | 'group_resubscribe'
+    | 'open'
+    | 'click';
   timestamp: number;
   email: string;
   reason?: string;
@@ -67,10 +76,16 @@ export class SendGridService {
 
   constructor(private readonly config: ConfigService) {
     this.apiKey = this.config.get('SENDGRID_API_KEY', '');
-    this.fromEmail = this.config.get('SENDGRID_FROM_EMAIL', 'assistant@company.com');
-    this.fromName = this.config.get('SENDGRID_FROM_NAME', 'Executive Assistant AI');
+    this.fromEmail = this.config.get(
+      'SENDGRID_FROM_EMAIL',
+      'assistant@company.com',
+    );
+    this.fromName = this.config.get(
+      'SENDGRID_FROM_NAME',
+      'Executive Assistant AI',
+    );
     this.isConfigured = !!this.apiKey;
-    
+
     if (this.isConfigured) {
       this.logger.log('SendGrid service configured successfully');
     } else {
@@ -84,49 +99,58 @@ export class SendGridService {
     }
 
     try {
-      this.logger.log(`Sending email: ${request.subject} to ${Array.isArray(request.to) ? request.to.join(', ') : request.to}`);
+      this.logger.log(
+        `Sending email: ${request.subject} to ${Array.isArray(request.to) ? request.to.join(', ') : request.to}`,
+      );
 
       // ACTUAL SENDGRID API INTEGRATION
       const emailData = {
-        personalizations: [{
-          to: Array.isArray(request.to)
-            ? request.to.map(email => ({ email }))
-            : [{ email: request.to }],
-          subject: request.subject,
-          ...(request.sendAt && { send_at: Math.floor(new Date(request.sendAt).getTime() / 1000) }),
-        }],
+        personalizations: [
+          {
+            to: Array.isArray(request.to)
+              ? request.to.map((email) => ({ email }))
+              : [{ email: request.to }],
+            subject: request.subject,
+            ...(request.sendAt && {
+              send_at: Math.floor(new Date(request.sendAt).getTime() / 1000),
+            }),
+          },
+        ],
         from: {
           email: this.fromEmail,
           name: this.fromName,
         },
-        content: [{
-          type: 'text/html',
-          value: request.html || request.text || '',
-        }],
-        ...(request.text && request.html && {
-          content: [
-            { type: 'text/plain', value: request.text },
-            { type: 'text/html', value: request.html },
-          ]
-        }),
+        content: [
+          {
+            type: 'text/html',
+            value: request.html || request.text || '',
+          },
+        ],
+        ...(request.text &&
+          request.html && {
+            content: [
+              { type: 'text/plain', value: request.text },
+              { type: 'text/html', value: request.html },
+            ],
+          }),
         tracking_settings: {
           click_tracking: { enable: true },
           open_tracking: { enable: true },
         },
         ...(request.attachments && {
-          attachments: request.attachments.map(att => ({
+          attachments: request.attachments.map((att) => ({
             content: att.content,
             filename: att.filename,
             type: att.type,
             disposition: 'attachment',
-          }))
+          })),
         }),
       };
 
       const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
+          Authorization: `Bearer ${this.apiKey}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(emailData),
@@ -134,12 +158,16 @@ export class SendGridService {
 
       if (!response.ok) {
         const errorText = await response.text();
-        this.logger.error(`SendGrid API error: ${response.status} ${errorText}`);
+        this.logger.error(
+          `SendGrid API error: ${response.status} ${errorText}`,
+        );
         throw new Error(`SendGrid API error: ${response.status}`);
       }
 
       // SendGrid returns 202 with X-Message-Id header
-      const messageId = response.headers.get('X-Message-Id') || `sg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const messageId =
+        response.headers.get('X-Message-Id') ||
+        `sg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
       this.logger.log(`Email sent successfully via SendGrid: ${messageId}`);
 
@@ -153,7 +181,6 @@ export class SendGridService {
           scheduled: !!request.sendAt,
         },
       };
-
     } catch (error) {
       this.logger.error('Failed to send email via SendGrid', error.stack);
       // Fallback to mock response for demo purposes
@@ -171,19 +198,24 @@ export class SendGridService {
       replyTo?: string;
       sendAt?: number;
       categories?: string[];
-    }
+    },
   ): Promise<EmailResponse> {
     if (!this.isConfigured) {
       return this.getMockTemplateEmailResponse(templateId, to, dynamicData);
     }
 
     try {
-      this.logger.log(`Sending template email: ${templateId} to ${Array.isArray(to) ? to.join(', ') : to}`);
-      
+      this.logger.log(
+        `Sending template email: ${templateId} to ${Array.isArray(to) ? to.join(', ') : to}`,
+      );
+
       // In a real implementation, this would call the SendGrid API
       return this.getMockTemplateEmailResponse(templateId, to, dynamicData);
     } catch (error) {
-      this.logger.error('Failed to send template email via SendGrid', error.stack);
+      this.logger.error(
+        'Failed to send template email via SendGrid',
+        error.stack,
+      );
       throw new Error('Failed to send template email');
     }
   }
@@ -195,7 +227,7 @@ export class SendGridService {
 
     try {
       this.logger.log('Fetching email templates from SendGrid');
-      
+
       // In a real implementation, this would call the SendGrid API
       return this.getMockTemplates();
     } catch (error) {
@@ -204,7 +236,10 @@ export class SendGridService {
     }
   }
 
-  async scheduleEmail(request: EmailRequest, sendAt: Date): Promise<EmailResponse> {
+  async scheduleEmail(
+    request: EmailRequest,
+    sendAt: Date,
+  ): Promise<EmailResponse> {
     const scheduledRequest = {
       ...request,
       sendAt: Math.floor(sendAt.getTime() / 1000), // Convert to Unix timestamp
@@ -221,7 +256,7 @@ export class SendGridService {
 
     try {
       this.logger.log(`Cancelling scheduled email: ${messageId}`);
-      
+
       // In a real implementation, this would call the SendGrid API
       return true;
     } catch (error) {
@@ -237,7 +272,7 @@ export class SendGridService {
 
     try {
       this.logger.log(`Fetching delivery status for: ${messageId}`);
-      
+
       // In a real implementation, this would call the SendGrid API
       return this.getMockDeliveryStatus(messageId);
     } catch (error) {
@@ -264,7 +299,7 @@ export class SendGridService {
 
   private getMockEmailResponse(request: EmailRequest): EmailResponse {
     const messageId = `mock_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
+
     return {
       messageId,
       status: 'queued',
@@ -280,10 +315,10 @@ export class SendGridService {
   private getMockTemplateEmailResponse(
     templateId: string,
     to: string | string[],
-    dynamicData: Record<string, any>
+    dynamicData: Record<string, any>,
   ): EmailResponse {
     const messageId = `mock_template_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
+
     return {
       messageId,
       status: 'queued',

@@ -10,7 +10,7 @@ import {
   AssistantResponseDto,
   AssistantAction,
   AnalyzeRequestDto,
-  BriefingRequestDto
+  BriefingRequestDto,
 } from '../dto/assistant.dto';
 
 @Injectable()
@@ -19,9 +19,11 @@ export class AssistantService {
 
   constructor(private readonly gemini: GeminiService) {}
 
-  async processRequest(request: ProcessRequestDto): Promise<AssistantResponseDto> {
+  async processRequest(
+    request: ProcessRequestDto,
+  ): Promise<AssistantResponseDto> {
     const startTime = Date.now();
-    
+
     try {
       this.logger.log('Processing assistant request', {
         inputLength: request.input.length,
@@ -30,7 +32,7 @@ export class AssistantService {
 
       // Analyze intent first
       const intentAnalysis = await this.gemini.analyzeIntent(request.input);
-      
+
       // Generate detailed response
       const prompt = this.buildProcessingPrompt(request, intentAnalysis);
       const geminiResponse = await this.gemini.generateResponse({
@@ -48,17 +50,23 @@ export class AssistantService {
 
       const duration = Date.now() - startTime;
 
-      this.logger.log(`Assistant request processed successfully in ${duration}ms`, {
-        intent: assistantResponse.intent,
-        confidence: assistantResponse.confidence,
-        actionsCount: assistantResponse.actions.length,
-      });
+      this.logger.log(
+        `Assistant request processed successfully in ${duration}ms`,
+        {
+          intent: assistantResponse.intent,
+          confidence: assistantResponse.confidence,
+          actionsCount: assistantResponse.actions.length,
+        },
+      );
 
       return assistantResponse;
     } catch (error) {
       const duration = Date.now() - startTime;
 
-      this.logger.error(`Failed to process assistant request in ${duration}ms`, error.stack);
+      this.logger.error(
+        `Failed to process assistant request in ${duration}ms`,
+        error.stack,
+      );
 
       // Return fallback response
       return this.getFallbackResponse(request.input);
@@ -68,7 +76,7 @@ export class AssistantService {
   async analyzeText(request: AnalyzeRequestDto): Promise<any> {
     try {
       const analysis = await this.gemini.analyzeIntent(request.text);
-      
+
       return {
         intent: analysis.intent,
         confidence: analysis.confidence,
@@ -86,19 +94,24 @@ export class AssistantService {
   async generateBriefing(request: BriefingRequestDto): Promise<any> {
     try {
       const date = request.date || new Date().toISOString().split('T')[0];
-      
+
       const prompt = `Generate a ${request.type} briefing for ${date}. Include:
 ${request.sections?.join(', ') || 'calendar, tasks, priorities, recommendations'}
 
 Format as a structured briefing with clear sections and actionable insights.`;
 
       const response = await this.gemini.generateResponse({ prompt });
-      
+
       return {
         date,
         type: request.type,
         content: response.text,
-        sections: request.sections || ['calendar', 'tasks', 'priorities', 'recommendations'],
+        sections: request.sections || [
+          'calendar',
+          'tasks',
+          'priorities',
+          'recommendations',
+        ],
         generatedAt: new Date().toISOString(),
       };
     } catch (error) {
@@ -162,7 +175,7 @@ Focus on actionable items and be specific with parameters.`;
       const jsonMatch = responseText.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         const parsed = JSON.parse(jsonMatch[0]);
-        
+
         return {
           intent: intentAnalysis.intent,
           confidence: parsed.metadata?.confidence || intentAnalysis.confidence,
@@ -184,7 +197,10 @@ Focus on actionable items and be specific with parameters.`;
       intent: intentAnalysis.intent,
       confidence: intentAnalysis.confidence,
       response: responseText,
-      actions: this.extractActionsFromIntent(intentAnalysis.intent, originalInput),
+      actions: this.extractActionsFromIntent(
+        intentAnalysis.intent,
+        originalInput,
+      ),
       metadata: {
         entities: intentAnalysis.entities,
         originalInput,
@@ -193,7 +209,10 @@ Focus on actionable items and be specific with parameters.`;
     };
   }
 
-  private extractActionsFromIntent(intent: string, input: string): AssistantAction[] {
+  private extractActionsFromIntent(
+    intent: string,
+    input: string,
+  ): AssistantAction[] {
     const actions: AssistantAction[] = [];
 
     switch (intent) {
@@ -255,7 +274,8 @@ Focus on actionable items and be specific with parameters.`;
     return {
       intent: 'general_assistance',
       confidence: 0.5,
-      response: 'I understand you need assistance. Could you please provide more specific details about what you\'d like me to help you with?',
+      response:
+        "I understand you need assistance. Could you please provide more specific details about what you'd like me to help you with?",
       actions: [
         {
           type: 'request_clarification',
@@ -282,11 +302,15 @@ Focus on actionable items and be specific with parameters.`;
     // Simple sentiment analysis
     const positiveWords = ['good', 'great', 'excellent', 'please', 'thank'];
     const negativeWords = ['urgent', 'asap', 'problem', 'issue', 'cancel'];
-    
+
     const words = text.toLowerCase().split(/\s+/);
-    const positiveCount = words.filter(word => positiveWords.includes(word)).length;
-    const negativeCount = words.filter(word => negativeWords.includes(word)).length;
-    
+    const positiveCount = words.filter((word) =>
+      positiveWords.includes(word),
+    ).length;
+    const negativeCount = words.filter((word) =>
+      negativeWords.includes(word),
+    ).length;
+
     if (positiveCount > negativeCount) return 'positive';
     if (negativeCount > positiveCount) return 'negative';
     return 'neutral';
@@ -295,7 +319,7 @@ Focus on actionable items and be specific with parameters.`;
   private analyzeComplexity(text: string): string {
     const wordCount = text.split(/\s+/).length;
     const sentenceCount = text.split(/[.!?]+/).length;
-    
+
     if (wordCount > 50 || sentenceCount > 3) return 'high';
     if (wordCount > 20 || sentenceCount > 1) return 'medium';
     return 'low';
@@ -325,10 +349,12 @@ Focus on actionable items and be specific with parameters.`;
       ],
     };
 
-    return suggestions[intent] || [
-      'Be more specific',
-      'Provide additional context',
-      'Try a different approach',
-    ];
+    return (
+      suggestions[intent] || [
+        'Be more specific',
+        'Provide additional context',
+        'Try a different approach',
+      ]
+    );
   }
 }

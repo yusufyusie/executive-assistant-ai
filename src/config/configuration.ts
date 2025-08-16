@@ -14,7 +14,17 @@
  * @author Executive Assistant AI Team
  */
 
-import { IsString, IsNumber, IsBoolean, IsOptional, IsEmail, IsUrl, IsEnum, Min, Max } from 'class-validator';
+import {
+  IsString,
+  IsNumber,
+  IsBoolean,
+  IsOptional,
+  IsEmail,
+  IsUrl,
+  IsEnum,
+  Min,
+  Max,
+} from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 
 /**
@@ -126,7 +136,9 @@ export class GoogleServicesConfig {
 
   @IsUrl()
   @IsOptional()
-  @Transform(({ value }) => value || 'http://localhost:3000/auth/google/callback')
+  @Transform(
+    ({ value }) => value || 'http://localhost:3000/auth/google/callback',
+  )
   redirectUri: string = 'http://localhost:3000/auth/google/callback';
 
   @IsString()
@@ -311,57 +323,96 @@ export const createConfiguration = (): AppConfig => {
   // Set application config
   config.application.name = process.env.APP_NAME || 'Executive Assistant AI';
   config.application.version = process.env.APP_VERSION || '2.0.0';
-  config.application.environment = (process.env.NODE_ENV as Environment) || Environment.DEVELOPMENT;
+  config.application.environment =
+    (process.env.NODE_ENV as Environment) || Environment.DEVELOPMENT;
   config.application.port = parseInt(process.env.PORT || '3000', 10);
-  config.application.logLevel = (process.env.LOG_LEVEL as LogLevel) || LogLevel.INFO;
+  config.application.logLevel =
+    (process.env.LOG_LEVEL as LogLevel) || LogLevel.INFO;
   config.application.timezone = process.env.TIMEZONE || 'UTC';
   config.application.enableMetrics = process.env.ENABLE_METRICS !== 'false';
-  config.application.enableHealthChecks = process.env.ENABLE_HEALTH_CHECKS !== 'false';
+  config.application.enableHealthChecks =
+    process.env.ENABLE_HEALTH_CHECKS !== 'false';
 
   // Set AI services config
   config.aiServices.geminiApiKey = process.env.GEMINI_API_KEY || '';
-  config.aiServices.geminiModel = process.env.GEMINI_MODEL || 'gemini-2.0-flash-exp';
-  config.aiServices.maxTokens = parseInt(process.env.GEMINI_MAX_TOKENS || '1000', 10);
-  config.aiServices.temperature = parseFloat(process.env.GEMINI_TEMPERATURE || '0.7');
-  config.aiServices.requestsPerMinute = parseInt(process.env.GEMINI_REQUESTS_PER_MINUTE || '15', 10);
+  config.aiServices.geminiModel =
+    process.env.GEMINI_MODEL || 'gemini-2.0-flash-exp';
+  config.aiServices.maxTokens = parseInt(
+    process.env.GEMINI_MAX_TOKENS || '1000',
+    10,
+  );
+  config.aiServices.temperature = parseFloat(
+    process.env.GEMINI_TEMPERATURE || '0.7',
+  );
+  config.aiServices.requestsPerMinute = parseInt(
+    process.env.GEMINI_REQUESTS_PER_MINUTE || '15',
+    10,
+  );
 
   // Set Google services config
   config.googleServices.clientId = process.env.GOOGLE_CLIENT_ID || '';
   config.googleServices.clientSecret = process.env.GOOGLE_CLIENT_SECRET || '';
-  config.googleServices.redirectUri = process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3000/auth/google/callback';
+  config.googleServices.redirectUri =
+    process.env.GOOGLE_REDIRECT_URI ||
+    'http://localhost:3000/auth/google/callback';
   config.googleServices.refreshToken = process.env.GOOGLE_REFRESH_TOKEN || '';
   config.googleServices.projectId = process.env.GCP_PROJECT_ID || '';
   config.googleServices.region = process.env.GCP_REGION || 'us-central1';
 
   // Set email services config
   config.emailServices.sendgridApiKey = process.env.SENDGRID_API_KEY || '';
-  config.emailServices.fromEmail = process.env.SENDGRID_FROM_EMAIL || 'assistant@example.com';
-  config.emailServices.fromName = process.env.SENDGRID_FROM_NAME || 'Executive Assistant AI';
-  config.emailServices.dailyLimit = parseInt(process.env.EMAIL_DAILY_LIMIT || '100', 10);
-  config.emailServices.enableTemplates = process.env.ENABLE_EMAIL_TEMPLATES !== 'false';
+  config.emailServices.fromEmail =
+    process.env.SENDGRID_FROM_EMAIL || 'assistant@example.com';
+  config.emailServices.fromName =
+    process.env.SENDGRID_FROM_NAME || 'Executive Assistant AI';
+  config.emailServices.dailyLimit = parseInt(
+    process.env.EMAIL_DAILY_LIMIT || '100',
+    10,
+  );
+  config.emailServices.enableTemplates =
+    process.env.ENABLE_EMAIL_TEMPLATES !== 'false';
 
   // Set security config
   config.security.jwtSecret = process.env.JWT_SECRET || 'dev-secret-key';
   config.security.apiKey = process.env.API_KEY || 'dev-api-key';
-  config.security.jwtExpirationTime = parseInt(process.env.JWT_EXPIRATION_TIME || '3600', 10);
+  config.security.jwtExpirationTime = parseInt(
+    process.env.JWT_EXPIRATION_TIME || '3600',
+    10,
+  );
   config.security.enableCors = process.env.ENABLE_CORS !== 'false';
   config.security.enableRateLimit = process.env.ENABLE_RATE_LIMIT !== 'false';
 
   // Set performance config
-  config.performance.rateLimitMax = parseInt(process.env.RATE_LIMIT_MAX || '100', 10);
-  config.performance.rateLimitTtl = parseInt(process.env.RATE_LIMIT_TTL || '60000', 10);
-  config.performance.cacheDefaultTtl = parseInt(process.env.CACHE_DEFAULT_TTL || '300', 10);
+  config.performance.rateLimitMax = parseInt(
+    process.env.RATE_LIMIT_MAX || '100',
+    10,
+  );
+  config.performance.rateLimitTtl = parseInt(
+    process.env.RATE_LIMIT_TTL || '60000',
+    10,
+  );
+  config.performance.cacheDefaultTtl = parseInt(
+    process.env.CACHE_DEFAULT_TTL || '300',
+    10,
+  );
   config.performance.enableCaching = process.env.ENABLE_CACHING !== 'false';
-  config.performance.enableCompression = process.env.ENABLE_COMPRESSION !== 'false';
+  config.performance.enableCompression =
+    process.env.ENABLE_COMPRESSION !== 'false';
 
   // Set feature flags
-  config.features.enableAIAssistant = process.env.FEATURE_AI_ASSISTANT !== 'false';
-  config.features.enableCalendarIntegration = process.env.FEATURE_CALENDAR_INTEGRATION !== 'false';
-  config.features.enableEmailAutomation = process.env.FEATURE_EMAIL_AUTOMATION !== 'false';
-  config.features.enableTaskManagement = process.env.FEATURE_TASK_MANAGEMENT !== 'false';
-  config.features.enableProactiveAutomation = process.env.FEATURE_PROACTIVE_AUTOMATION !== 'false';
+  config.features.enableAIAssistant =
+    process.env.FEATURE_AI_ASSISTANT !== 'false';
+  config.features.enableCalendarIntegration =
+    process.env.FEATURE_CALENDAR_INTEGRATION !== 'false';
+  config.features.enableEmailAutomation =
+    process.env.FEATURE_EMAIL_AUTOMATION !== 'false';
+  config.features.enableTaskManagement =
+    process.env.FEATURE_TASK_MANAGEMENT !== 'false';
+  config.features.enableProactiveAutomation =
+    process.env.FEATURE_PROACTIVE_AUTOMATION !== 'false';
   config.features.enableAnalytics = process.env.FEATURE_ANALYTICS !== 'false';
-  config.features.enableAdvancedLogging = process.env.FEATURE_ADVANCED_LOGGING !== 'false';
+  config.features.enableAdvancedLogging =
+    process.env.FEATURE_ADVANCED_LOGGING !== 'false';
 
   return config;
 };
@@ -383,7 +434,9 @@ export const legacyConfiguration = (): any => ({
   google: {
     clientId: process.env.GOOGLE_CLIENT_ID || '',
     clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
-    redirectUri: process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3000/auth/google/callback',
+    redirectUri:
+      process.env.GOOGLE_REDIRECT_URI ||
+      'http://localhost:3000/auth/google/callback',
     refreshToken: process.env.GOOGLE_REFRESH_TOKEN || '',
     projectId: process.env.GCP_PROJECT_ID || '',
   },
@@ -398,9 +451,18 @@ export const legacyConfiguration = (): any => ({
     schedulerTimezone: process.env.GCP_SCHEDULER_TIMEZONE || 'America/New_York',
   },
   application: {
-    maxCalendarDaysAhead: parseInt(process.env.MAX_CALENDAR_DAYS_AHEAD || '90', 10),
-    emailRateLimitPerHour: parseInt(process.env.EMAIL_RATE_LIMIT_PER_HOUR || '50', 10),
-    taskReminderAdvanceHours: parseInt(process.env.TASK_REMINDER_ADVANCE_HOURS || '24', 10),
+    maxCalendarDaysAhead: parseInt(
+      process.env.MAX_CALENDAR_DAYS_AHEAD || '90',
+      10,
+    ),
+    emailRateLimitPerHour: parseInt(
+      process.env.EMAIL_RATE_LIMIT_PER_HOUR || '50',
+      10,
+    ),
+    taskReminderAdvanceHours: parseInt(
+      process.env.TASK_REMINDER_ADVANCE_HOURS || '24',
+      10,
+    ),
   },
   security: {
     jwtSecret: process.env.JWT_SECRET || 'dev-secret-key',
@@ -415,10 +477,12 @@ export const legacyConfiguration = (): any => ({
   },
   features: {
     enableAIAssistant: process.env.FEATURE_AI_ASSISTANT !== 'false',
-    enableCalendarIntegration: process.env.FEATURE_CALENDAR_INTEGRATION !== 'false',
+    enableCalendarIntegration:
+      process.env.FEATURE_CALENDAR_INTEGRATION !== 'false',
     enableEmailAutomation: process.env.FEATURE_EMAIL_AUTOMATION !== 'false',
     enableTaskManagement: process.env.FEATURE_TASK_MANAGEMENT !== 'false',
-    enableProactiveAutomation: process.env.FEATURE_PROACTIVE_AUTOMATION !== 'false',
+    enableProactiveAutomation:
+      process.env.FEATURE_PROACTIVE_AUTOMATION !== 'false',
     enableAnalytics: process.env.FEATURE_ANALYTICS !== 'false',
     enableAdvancedLogging: process.env.FEATURE_ADVANCED_LOGGING !== 'false',
   },
@@ -448,7 +512,10 @@ export const validateConfig = (config: any): string[] => {
     if (!config.emailServices?.sendgridApiKey) {
       errors.push('SENDGRID_API_KEY is required in production');
     }
-    if (!config.googleServices?.clientId || !config.googleServices?.clientSecret) {
+    if (
+      !config.googleServices?.clientId ||
+      !config.googleServices?.clientSecret
+    ) {
       errors.push('Google OAuth credentials are required in production');
     }
     if (!config.security?.jwtSecret) {
@@ -457,13 +524,19 @@ export const validateConfig = (config: any): string[] => {
   }
 
   // Validate port range
-  if (config.application?.port && (config.application.port < 1 || config.application.port > 65535)) {
+  if (
+    config.application?.port &&
+    (config.application.port < 1 || config.application.port > 65535)
+  ) {
     errors.push('PORT must be between 1 and 65535');
   }
 
   // Validate email format
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (config.emailServices?.fromEmail && !emailRegex.test(config.emailServices.fromEmail)) {
+  if (
+    config.emailServices?.fromEmail &&
+    !emailRegex.test(config.emailServices.fromEmail)
+  ) {
     errors.push('SENDGRID_FROM_EMAIL must be a valid email address');
   }
 

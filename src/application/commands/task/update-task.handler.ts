@@ -9,13 +9,23 @@ import { Result, success, failure } from '../../common/result';
 import { UpdateTaskCommand } from './update-task.command';
 import { TaskResponseDto } from '../../dtos/task.dto';
 import type { TaskRepository } from '../../../domain/repositories/task.repository';
-import { Priority, TaskStatus, Email } from '../../../domain/common/value-objects';
+import {
+  Priority,
+  TaskStatus,
+  Email,
+} from '../../../domain/common/value-objects';
 
 @Injectable()
-export class UpdateTaskHandler implements CommandHandler<UpdateTaskCommand, Result<TaskResponseDto, string>> {
-  constructor(@Inject('TaskRepository') private readonly taskRepository: TaskRepository) {}
+export class UpdateTaskHandler
+  implements CommandHandler<UpdateTaskCommand, Result<TaskResponseDto, string>>
+{
+  constructor(
+    @Inject('TaskRepository') private readonly taskRepository: TaskRepository,
+  ) {}
 
-  async handle(command: UpdateTaskCommand): Promise<Result<TaskResponseDto, string>> {
+  async handle(
+    command: UpdateTaskCommand,
+  ): Promise<Result<TaskResponseDto, string>> {
     try {
       const { taskId, data } = command;
 
@@ -73,9 +83,9 @@ export class UpdateTaskHandler implements CommandHandler<UpdateTaskCommand, Resu
       if (data.tags !== undefined) {
         // Remove all existing tags and add new ones
         const currentTags = [...task.tags];
-        currentTags.forEach(tag => task.removeTag(tag));
-        
-        data.tags.forEach(tag => {
+        currentTags.forEach((tag) => task.removeTag(tag));
+
+        data.tags.forEach((tag) => {
           if (tag.trim()) {
             task.addTag(tag.trim());
           }
@@ -85,9 +95,9 @@ export class UpdateTaskHandler implements CommandHandler<UpdateTaskCommand, Resu
       if (data.dependencies !== undefined) {
         // Remove all existing dependencies and add new ones
         const currentDependencies = [...task.dependencies];
-        currentDependencies.forEach(depId => task.removeDependency(depId));
-        
-        data.dependencies.forEach(depId => {
+        currentDependencies.forEach((depId) => task.removeDependency(depId));
+
+        data.dependencies.forEach((depId) => {
           if (depId.trim()) {
             task.addDependency(depId.trim());
           }
@@ -102,7 +112,10 @@ export class UpdateTaskHandler implements CommandHandler<UpdateTaskCommand, Resu
 
       return success(responseDto);
     } catch (error) {
-      if (error.message.includes('Invalid') || error.message.includes('cannot')) {
+      if (
+        error.message.includes('Invalid') ||
+        error.message.includes('cannot')
+      ) {
         return failure(error.message);
       }
       return failure('Failed to update task');
@@ -111,7 +124,7 @@ export class UpdateTaskHandler implements CommandHandler<UpdateTaskCommand, Resu
 
   private mapToResponseDto(task: any): TaskResponseDto {
     const taskJson = task.toJSON();
-    
+
     return {
       id: taskJson.id,
       title: taskJson.title,

@@ -39,7 +39,10 @@ export class GoogleOAuthService {
     this.config = {
       clientId: this.configService.get('GOOGLE_CLIENT_ID', ''),
       clientSecret: this.configService.get('GOOGLE_CLIENT_SECRET', ''),
-      redirectUri: this.configService.get('GOOGLE_REDIRECT_URI', 'http://localhost:3000/auth/google/callback'),
+      redirectUri: this.configService.get(
+        'GOOGLE_REDIRECT_URI',
+        'http://localhost:3000/auth/google/callback',
+      ),
       scopes: [
         'https://www.googleapis.com/auth/userinfo.email',
         'https://www.googleapis.com/auth/userinfo.profile',
@@ -49,11 +52,13 @@ export class GoogleOAuthService {
     };
 
     this.isConfigured = !!(this.config.clientId && this.config.clientSecret);
-    
+
     if (this.isConfigured) {
       this.logger.log('Google OAuth service configured successfully');
     } else {
-      this.logger.warn('Google OAuth credentials not found, using mock responses');
+      this.logger.warn(
+        'Google OAuth credentials not found, using mock responses',
+      );
     }
   }
 
@@ -77,7 +82,7 @@ export class GoogleOAuthService {
 
     const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
     this.logger.log('Generated OAuth authorization URL');
-    
+
     return authUrl;
   }
 
@@ -109,7 +114,9 @@ export class GoogleOAuthService {
 
       if (!response.ok) {
         const errorText = await response.text();
-        this.logger.error(`OAuth token exchange failed: ${response.status} ${errorText}`);
+        this.logger.error(
+          `OAuth token exchange failed: ${response.status} ${errorText}`,
+        );
         throw new Error(`OAuth token exchange failed: ${response.status}`);
       }
 
@@ -124,7 +131,6 @@ export class GoogleOAuthService {
         tokenType: data.token_type,
         scope: data.scope,
       };
-
     } catch (error) {
       this.logger.error('Failed to exchange code for tokens', error.stack);
       // Fallback to mock tokens for demo purposes
@@ -142,7 +148,7 @@ export class GoogleOAuthService {
 
     try {
       this.logger.log('Refreshing access token');
-      
+
       // In a real implementation, this would call the Google OAuth API
       return this.getMockTokens();
     } catch (error) {
@@ -161,7 +167,7 @@ export class GoogleOAuthService {
 
     try {
       this.logger.log('Fetching user profile');
-      
+
       // In a real implementation, this would call the Google UserInfo API
       return this.getMockUserProfile();
     } catch (error) {
@@ -181,7 +187,7 @@ export class GoogleOAuthService {
 
     try {
       this.logger.log('Revoking access token');
-      
+
       // In a real implementation, this would call the Google OAuth revoke endpoint
       return true;
     } catch (error) {
@@ -199,14 +205,22 @@ export class GoogleOAuthService {
     scope?: string;
   }> {
     if (!this.isConfigured) {
-      return { valid: true, expiresIn: 3600, scope: this.config.scopes.join(' ') };
+      return {
+        valid: true,
+        expiresIn: 3600,
+        scope: this.config.scopes.join(' '),
+      };
     }
 
     try {
       this.logger.log('Validating access token');
-      
+
       // In a real implementation, this would call the Google OAuth tokeninfo endpoint
-      return { valid: true, expiresIn: 3600, scope: this.config.scopes.join(' ') };
+      return {
+        valid: true,
+        expiresIn: 3600,
+        scope: this.config.scopes.join(' '),
+      };
     } catch (error) {
       this.logger.error('Failed to validate token', error.stack);
       return { valid: false };
@@ -222,7 +236,9 @@ export class GoogleOAuthService {
   } {
     return {
       configured: this.isConfigured,
-      clientId: this.config.clientId ? `${this.config.clientId.substring(0, 10)}...` : 'Not configured',
+      clientId: this.config.clientId
+        ? `${this.config.clientId.substring(0, 10)}...`
+        : 'Not configured',
       scopes: this.config.scopes,
       redirectUri: this.config.redirectUri,
       lastCheck: new Date().toISOString(),

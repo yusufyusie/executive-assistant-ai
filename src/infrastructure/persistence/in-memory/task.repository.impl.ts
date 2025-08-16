@@ -4,7 +4,10 @@
  */
 
 import { Injectable } from '@nestjs/common';
-import { TaskRepository, TaskQueryOptions } from '../../../domain/repositories/task.repository';
+import {
+  TaskRepository,
+  TaskQueryOptions,
+} from '../../../domain/repositories/task.repository';
 import { Task } from '../../../domain/entities/task.entity';
 import { Priority, TaskStatus } from '../../../domain/common/value-objects';
 import { QueryResult } from '../../../domain/common/repository.interface';
@@ -28,40 +31,40 @@ export class InMemoryTaskRepository implements TaskRepository {
   }
 
   async findByStatus(status: TaskStatus): Promise<Task[]> {
-    return Array.from(this.tasks.values()).filter(task => 
-      task.status.equals(status)
+    return Array.from(this.tasks.values()).filter((task) =>
+      task.status.equals(status),
     );
   }
 
   async findByPriority(priority: Priority): Promise<Task[]> {
-    return Array.from(this.tasks.values()).filter(task => 
-      task.priority.equals(priority)
+    return Array.from(this.tasks.values()).filter((task) =>
+      task.priority.equals(priority),
     );
   }
 
   async findByAssignee(assigneeEmail: string): Promise<Task[]> {
-    return Array.from(this.tasks.values()).filter(task => 
-      task.assignee?.value === assigneeEmail
+    return Array.from(this.tasks.values()).filter(
+      (task) => task.assignee?.value === assigneeEmail,
     );
   }
 
   async findOverdueTasks(): Promise<Task[]> {
-    return Array.from(this.tasks.values()).filter(task => task.isOverdue);
+    return Array.from(this.tasks.values()).filter((task) => task.isOverdue);
   }
 
   async findTasksDueWithin(days: number): Promise<Task[]> {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() + days);
 
-    return Array.from(this.tasks.values()).filter(task => {
+    return Array.from(this.tasks.values()).filter((task) => {
       if (!task.dueDate) return false;
       return task.dueDate <= cutoffDate && task.dueDate >= new Date();
     });
   }
 
   async findByTags(tags: string[]): Promise<Task[]> {
-    return Array.from(this.tasks.values()).filter(task => 
-      tags.some(tag => task.tags.includes(tag.toLowerCase()))
+    return Array.from(this.tasks.values()).filter((task) =>
+      tags.some((tag) => task.tags.includes(tag.toLowerCase())),
     );
   }
 
@@ -75,7 +78,11 @@ export class InMemoryTaskRepository implements TaskRepository {
 
     // Apply sorting
     if (options?.sortBy) {
-      tasks = this.applySorting(tasks, options.sortBy, options.sortOrder || 'asc');
+      tasks = this.applySorting(
+        tasks,
+        options.sortBy,
+        options.sortOrder || 'asc',
+      );
     }
 
     // Calculate total before pagination
@@ -135,22 +142,25 @@ export class InMemoryTaskRepository implements TaskRepository {
   }> {
     const tasks = Array.from(this.tasks.values());
     const total = tasks.length;
-    const completed = tasks.filter(t => t.status.value === 'completed').length;
-    const overdue = tasks.filter(t => t.isOverdue).length;
+    const completed = tasks.filter(
+      (t) => t.status.value === 'completed',
+    ).length;
+    const overdue = tasks.filter((t) => t.isOverdue).length;
     const completionRate = total > 0 ? (completed / total) * 100 : 0;
 
     // Calculate average completion time
-    const completedTasks = tasks.filter(t => t.completedAt);
+    const completedTasks = tasks.filter((t) => t.completedAt);
     let averageCompletionTime = 0;
-    
+
     if (completedTasks.length > 0) {
       const totalCompletionTime = completedTasks.reduce((sum, task) => {
         const createdAt = new Date(task.createdAt);
         const completedAt = task.completedAt!;
         return sum + (completedAt.getTime() - createdAt.getTime());
       }, 0);
-      
-      averageCompletionTime = totalCompletionTime / completedTasks.length / (1000 * 60 * 60 * 24); // in days
+
+      averageCompletionTime =
+        totalCompletionTime / completedTasks.length / (1000 * 60 * 60 * 24); // in days
     }
 
     const byStatus = await this.countByStatus();
@@ -168,7 +178,7 @@ export class InMemoryTaskRepository implements TaskRepository {
   }
 
   private applyFilters(tasks: Task[], filters: any): Task[] {
-    return tasks.filter(task => {
+    return tasks.filter((task) => {
       if (filters.status && !task.status.equals(filters.status)) {
         return false;
       }
@@ -182,23 +192,34 @@ export class InMemoryTaskRepository implements TaskRepository {
       }
 
       if (filters.tags && filters.tags.length > 0) {
-        const hasMatchingTag = filters.tags.some((tag: string) => 
-          task.tags.includes(tag.toLowerCase())
+        const hasMatchingTag = filters.tags.some((tag: string) =>
+          task.tags.includes(tag.toLowerCase()),
         );
         if (!hasMatchingTag) {
           return false;
         }
       }
 
-      if (filters.dueDateFrom && task.dueDate && task.dueDate < filters.dueDateFrom) {
+      if (
+        filters.dueDateFrom &&
+        task.dueDate &&
+        task.dueDate < filters.dueDateFrom
+      ) {
         return false;
       }
 
-      if (filters.dueDateTo && task.dueDate && task.dueDate > filters.dueDateTo) {
+      if (
+        filters.dueDateTo &&
+        task.dueDate &&
+        task.dueDate > filters.dueDateTo
+      ) {
         return false;
       }
 
-      if (filters.isOverdue !== undefined && task.isOverdue !== filters.isOverdue) {
+      if (
+        filters.isOverdue !== undefined &&
+        task.isOverdue !== filters.isOverdue
+      ) {
         return false;
       }
 
@@ -213,7 +234,11 @@ export class InMemoryTaskRepository implements TaskRepository {
     });
   }
 
-  private applySorting(tasks: Task[], sortBy: string, sortOrder: 'asc' | 'desc'): Task[] {
+  private applySorting(
+    tasks: Task[],
+    sortBy: string,
+    sortOrder: 'asc' | 'desc',
+  ): Task[] {
     return tasks.sort((a, b) => {
       let comparison = 0;
 
@@ -222,10 +247,12 @@ export class InMemoryTaskRepository implements TaskRepository {
           comparison = a.title.localeCompare(b.title);
           break;
         case 'createdAt':
-          comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+          comparison =
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
           break;
         case 'updatedAt':
-          comparison = new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime();
+          comparison =
+            new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime();
           break;
         case 'dueDate':
           if (!a.dueDate && !b.dueDate) comparison = 0;

@@ -3,7 +3,15 @@
  * Data transfer objects for assistant operations
  */
 
-import { IsString, IsOptional, IsObject, IsEnum, IsNumber, Min, Max } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsObject,
+  IsEnum,
+  IsNumber,
+  Min,
+  Max,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class ProcessRequestDto {
@@ -78,7 +86,7 @@ export class AssistantResponseDto {
 
   @ApiProperty({
     description: 'Natural language response',
-    example: 'I\'ll schedule a meeting with John for next Tuesday at 2 PM.',
+    example: "I'll schedule a meeting with John for next Tuesday at 2 PM.",
   })
   response: string;
 

@@ -26,6 +26,11 @@ import { TaskModule } from '../task/task.module';
     GoogleCalendarService,
     SendGridService,
   ],
-  exports: [AIAssistantService, GeminiService, GoogleCalendarService, SendGridService],
+  exports: [
+    AIAssistantService,
+    GeminiService,
+    GoogleCalendarService,
+    SendGridService,
+  ],
 })
 export class AssistantModule {}

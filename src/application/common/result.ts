@@ -7,7 +7,7 @@ export class Result<T, E = Error> {
   private constructor(
     private readonly _isSuccess: boolean,
     private readonly _value?: T,
-    private readonly _error?: E
+    private readonly _error?: E,
   ) {}
 
   public static success<T, E = Error>(value: T): Result<T, E> {
@@ -61,10 +61,7 @@ export class Result<T, E = Error> {
     return Result.failure(this._error!);
   }
 
-  public match<U>(
-    onSuccess: (value: T) => U,
-    onFailure: (error: E) => U
-  ): U {
+  public match<U>(onSuccess: (value: T) => U, onFailure: (error: E) => U): U {
     if (this._isSuccess) {
       return onSuccess(this._value!);
     }
@@ -86,29 +83,37 @@ export class Result<T, E = Error> {
 export type AsyncResult<T, E = Error> = Promise<Result<T, E>>;
 
 // Helper functions for common patterns
-export const success = <T, E = Error>(value: T): Result<T, E> => Result.success(value);
-export const failure = <T, E = Error>(error: E): Result<T, E> => Result.failure(error);
+export const success = <T, E = Error>(value: T): Result<T, E> =>
+  Result.success(value);
+export const failure = <T, E = Error>(error: E): Result<T, E> =>
+  Result.failure(error);
 
 // Utility functions for working with arrays of results
-export const combineResults = <T, E = Error>(results: Result<T, E>[]): Result<T[], E> => {
+export const combineResults = <T, E = Error>(
+  results: Result<T, E>[],
+): Result<T[], E> => {
   const values: T[] = [];
-  
+
   for (const result of results) {
     if (result.isFailure) {
       return Result.failure(result.error);
     }
     values.push(result.value);
   }
-  
+
   return Result.success(values);
 };
 
-export const firstSuccess = <T, E = Error>(results: Result<T, E>[]): Result<T, E> => {
+export const firstSuccess = <T, E = Error>(
+  results: Result<T, E>[],
+): Result<T, E> => {
   for (const result of results) {
     if (result.isSuccess) {
       return result;
     }
   }
-  
-  return results.length > 0 ? results[results.length - 1] : Result.failure('No results provided' as any);
+
+  return results.length > 0
+    ? results[results.length - 1]
+    : Result.failure('No results provided' as any);
 };

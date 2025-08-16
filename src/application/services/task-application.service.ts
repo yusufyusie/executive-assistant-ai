@@ -10,15 +10,15 @@ import { GetTasksHandler } from '../queries/task/get-tasks.handler';
 import { CreateTaskCommand } from '../commands/task/create-task.command';
 import { UpdateTaskCommand } from '../commands/task/update-task.command';
 import { GetTasksQuery } from '../queries/task/get-tasks.query';
-import { 
-  CreateTaskDto, 
-  UpdateTaskDto, 
-  TaskQueryDto, 
-  TaskResponseDto, 
+import {
+  CreateTaskDto,
+  UpdateTaskDto,
+  TaskQueryDto,
+  TaskResponseDto,
   TaskListResponseDto,
   PrioritizeTasksDto,
   TaskPrioritizationResponseDto,
-  TaskAnalyticsResponseDto
+  TaskAnalyticsResponseDto,
 } from '../dtos/task.dto';
 import { Result } from '../common/result';
 import type { TaskRepository } from '../../domain/repositories/task.repository';
@@ -35,17 +35,24 @@ export class TaskApplicationService {
     private readonly taskPrioritizationService: TaskPrioritizationService,
   ) {}
 
-  async createTask(data: CreateTaskDto): Promise<Result<TaskResponseDto, string>> {
+  async createTask(
+    data: CreateTaskDto,
+  ): Promise<Result<TaskResponseDto, string>> {
     const command = new CreateTaskCommand(data);
     return this.createTaskHandler.handle(command);
   }
 
-  async updateTask(taskId: string, data: UpdateTaskDto): Promise<Result<TaskResponseDto, string>> {
+  async updateTask(
+    taskId: string,
+    data: UpdateTaskDto,
+  ): Promise<Result<TaskResponseDto, string>> {
     const command = new UpdateTaskCommand(taskId, data);
     return this.updateTaskHandler.handle(command);
   }
 
-  async getTasks(options?: TaskQueryDto): Promise<Result<TaskListResponseDto, string>> {
+  async getTasks(
+    options?: TaskQueryDto,
+  ): Promise<Result<TaskListResponseDto, string>> {
     const query = new GetTasksQuery(options);
     return this.getTasksHandler.handle(query);
   }
@@ -78,10 +85,12 @@ export class TaskApplicationService {
     }
   }
 
-  async prioritizeTasks(data: PrioritizeTasksDto): Promise<Result<TaskPrioritizationResponseDto, string>> {
+  async prioritizeTasks(
+    data: PrioritizeTasksDto,
+  ): Promise<Result<TaskPrioritizationResponseDto, string>> {
     try {
       let tasks;
-      
+
       if (data.taskIds && data.taskIds.length > 0) {
         // Get specific tasks
         tasks = [];
@@ -98,8 +107,10 @@ export class TaskApplicationService {
             status: undefined, // Get all statuses except completed/cancelled
           },
         });
-        tasks = result.items.filter(task => 
-          task.status.value !== 'completed' && task.status.value !== 'cancelled'
+        tasks = result.items.filter(
+          (task) =>
+            task.status.value !== 'completed' &&
+            task.status.value !== 'cancelled',
         );
       }
 
@@ -108,14 +119,12 @@ export class TaskApplicationService {
       }
 
       // Perform prioritization
-      const prioritizationResult = this.taskPrioritizationService.prioritizeTasks(
-        tasks,
-        data.criteria
-      );
+      const prioritizationResult =
+        this.taskPrioritizationService.prioritizeTasks(tasks, data.criteria);
 
       // Map to DTO
       const responseDto: TaskPrioritizationResponseDto = {
-        prioritizedTasks: prioritizationResult.prioritizedTasks.map(pt => ({
+        prioritizedTasks: prioritizationResult.prioritizedTasks.map((pt) => ({
           task: this.mapToResponseDto(pt.task),
           score: pt.score,
           recommendation: pt.recommendation,
@@ -131,20 +140,28 @@ export class TaskApplicationService {
     }
   }
 
-  async getTasksByPriority(priority: string): Promise<Result<TaskResponseDto[], string>> {
+  async getTasksByPriority(
+    priority: string,
+  ): Promise<Result<TaskResponseDto[], string>> {
     try {
-      const tasks = await this.taskRepository.findByPriority(new Priority(priority));
-      const responseDtos = tasks.map(task => this.mapToResponseDto(task));
+      const tasks = await this.taskRepository.findByPriority(
+        new Priority(priority),
+      );
+      const responseDtos = tasks.map((task) => this.mapToResponseDto(task));
       return Result.success(responseDtos);
     } catch (error) {
       return Result.failure('Failed to retrieve tasks by priority');
     }
   }
 
-  async getTasksByStatus(status: string): Promise<Result<TaskResponseDto[], string>> {
+  async getTasksByStatus(
+    status: string,
+  ): Promise<Result<TaskResponseDto[], string>> {
     try {
-      const tasks = await this.taskRepository.findByStatus(new TaskStatus(status));
-      const responseDtos = tasks.map(task => this.mapToResponseDto(task));
+      const tasks = await this.taskRepository.findByStatus(
+        new TaskStatus(status),
+      );
+      const responseDtos = tasks.map((task) => this.mapToResponseDto(task));
       return Result.success(responseDtos);
     } catch (error) {
       return Result.failure('Failed to retrieve tasks by status');
@@ -154,7 +171,7 @@ export class TaskApplicationService {
   async getOverdueTasks(): Promise<Result<TaskResponseDto[], string>> {
     try {
       const tasks = await this.taskRepository.findOverdueTasks();
-      const responseDtos = tasks.map(task => this.mapToResponseDto(task));
+      const responseDtos = tasks.map((task) => this.mapToResponseDto(task));
       return Result.success(responseDtos);
     } catch (error) {
       return Result.failure('Failed to retrieve overdue tasks');
@@ -172,7 +189,7 @@ export class TaskApplicationService {
 
   private mapToResponseDto(task: any): TaskResponseDto {
     const taskJson = task.toJSON();
-    
+
     return {
       id: taskJson.id,
       title: taskJson.title,

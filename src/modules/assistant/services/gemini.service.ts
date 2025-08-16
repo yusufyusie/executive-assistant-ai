@@ -57,7 +57,9 @@ export class GeminiService {
 
     try {
       // In a real implementation, this would call the Gemini API
-      this.logger.log(`Generating response for prompt: ${request.prompt.substring(0, 50)}...`);
+      this.logger.log(
+        `Generating response for prompt: ${request.prompt.substring(0, 50)}...`,
+      );
 
       // For now, return intelligent mock response
       return this.getMockResponse(request.prompt);
@@ -84,7 +86,7 @@ Respond with a JSON object containing:
 JSON:`;
 
     const response = await this.generateResponse({ prompt });
-    
+
     try {
       const parsed = JSON.parse(response.text);
       return {
@@ -93,7 +95,9 @@ JSON:`;
         entities: parsed.entities || {},
       };
     } catch (error) {
-      this.logger.warn('Failed to parse intent analysis response', { text: response.text });
+      this.logger.warn('Failed to parse intent analysis response', {
+        text: response.text,
+      });
       return this.getMockIntentAnalysis(text);
     }
   }
@@ -130,19 +134,27 @@ Always respond in a professional, helpful, and concise manner. When providing ac
 
   private getMockResponse(prompt: string): GeminiResponse {
     const lowerPrompt = prompt.toLowerCase();
-    
+
     let mockText = '';
-    
+
     if (lowerPrompt.includes('meeting') || lowerPrompt.includes('schedule')) {
-      mockText = 'I can help you schedule a meeting. Please provide the attendees, preferred date and time, and meeting duration.';
+      mockText =
+        'I can help you schedule a meeting. Please provide the attendees, preferred date and time, and meeting duration.';
     } else if (lowerPrompt.includes('email') || lowerPrompt.includes('send')) {
-      mockText = 'I can help you compose and send an email. What would you like to include in the message?';
+      mockText =
+        'I can help you compose and send an email. What would you like to include in the message?';
     } else if (lowerPrompt.includes('task') || lowerPrompt.includes('todo')) {
-      mockText = 'I can help you create and manage tasks. What task would you like to add to your list?';
-    } else if (lowerPrompt.includes('briefing') || lowerPrompt.includes('summary')) {
-      mockText = 'Here\'s your daily briefing with key updates, upcoming meetings, and priority tasks for today.';
+      mockText =
+        'I can help you create and manage tasks. What task would you like to add to your list?';
+    } else if (
+      lowerPrompt.includes('briefing') ||
+      lowerPrompt.includes('summary')
+    ) {
+      mockText =
+        "Here's your daily briefing with key updates, upcoming meetings, and priority tasks for today.";
     } else {
-      mockText = 'I\'m here to help with scheduling, emails, tasks, and daily briefings. How can I assist you today?';
+      mockText =
+        "I'm here to help with scheduling, emails, tasks, and daily briefings. How can I assist you today?";
     }
 
     return {
@@ -157,7 +169,7 @@ Always respond in a professional, helpful, and concise manner. When providing ac
     entities: Record<string, any>;
   } {
     const lowerText = text.toLowerCase();
-    
+
     if (lowerText.includes('meeting') || lowerText.includes('schedule')) {
       return {
         intent: 'schedule_meeting',
@@ -165,7 +177,7 @@ Always respond in a professional, helpful, and concise manner. When providing ac
         entities: { type: 'meeting' },
       };
     }
-    
+
     if (lowerText.includes('email') || lowerText.includes('send')) {
       return {
         intent: 'send_email',
@@ -173,7 +185,7 @@ Always respond in a professional, helpful, and concise manner. When providing ac
         entities: { type: 'email' },
       };
     }
-    
+
     if (lowerText.includes('task') || lowerText.includes('todo')) {
       return {
         intent: 'create_task',
@@ -181,7 +193,7 @@ Always respond in a professional, helpful, and concise manner. When providing ac
         entities: { type: 'task' },
       };
     }
-    
+
     return {
       intent: 'general_assistance',
       confidence: 0.6,

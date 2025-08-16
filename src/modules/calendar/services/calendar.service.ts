@@ -55,7 +55,7 @@ export class CalendarService {
 
         const availability = await this.checkAvailability(
           checkDate.toISOString().split('T')[0],
-          request.duration || 60
+          request.duration || 60,
         );
 
         if (availability.availableSlots.length > 0) {
@@ -68,7 +68,7 @@ export class CalendarService {
       }
 
       suggestions.sort((a, b) => b.score - a.score);
-      
+
       return {
         title: request.title,
         duration: request.duration || 60,
@@ -85,12 +85,21 @@ export class CalendarService {
     return {
       status: 'healthy',
       googleCalendar: this.googleCalendar.getStatus(),
-      features: ['events', 'scheduling', 'availability', 'intelligent-scheduling'],
+      features: [
+        'events',
+        'scheduling',
+        'availability',
+        'intelligent-scheduling',
+      ],
       timestamp: new Date().toISOString(),
     };
   }
 
-  private calculateAvailability(events: any[], date: string, duration: number): any {
+  private calculateAvailability(
+    events: any[],
+    date: string,
+    duration: number,
+  ): any {
     const workingHours = { start: 9, end: 17 };
     const availableSlots: Array<{
       start: string;
@@ -98,20 +107,20 @@ export class CalendarService {
       duration: number;
     }> = [];
     const targetDate = new Date(date);
-    
+
     for (let hour = workingHours.start; hour < workingHours.end; hour++) {
       const slotStart = new Date(targetDate);
       slotStart.setHours(hour, 0, 0, 0);
-      
+
       const slotEnd = new Date(slotStart);
       slotEnd.setMinutes(slotEnd.getMinutes() + duration);
-      
-      const isAvailable = !events.some(event => {
+
+      const isAvailable = !events.some((event) => {
         const eventStart = new Date(event.start?.dateTime || event.start?.date);
         const eventEnd = new Date(event.end?.dateTime || event.end?.date);
-        return (slotStart < eventEnd && slotEnd > eventStart);
+        return slotStart < eventEnd && slotEnd > eventStart;
       });
-      
+
       if (isAvailable) {
         availableSlots.push({
           start: slotStart.toISOString(),
@@ -120,7 +129,7 @@ export class CalendarService {
         });
       }
     }
-    
+
     return {
       date,
       availableSlots,
@@ -130,9 +139,9 @@ export class CalendarService {
 
   private calculateScore(slots: any[], request: any): number {
     let score = slots.length * 10;
-    
+
     if (request.preferredTimes) {
-      slots.forEach(slot => {
+      slots.forEach((slot) => {
         const slotHour = new Date(slot.start).getHours();
         request.preferredTimes.forEach((preferredTime: string) => {
           const preferredHour = parseInt(preferredTime.split(':')[0]);
@@ -142,10 +151,10 @@ export class CalendarService {
         });
       });
     }
-    
+
     if (request.priority === 'high') score *= 1.5;
     if (request.priority === 'low') score *= 0.8;
-    
+
     return score;
   }
 }

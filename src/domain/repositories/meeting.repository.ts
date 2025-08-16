@@ -3,7 +3,12 @@
  * Contract for meeting data persistence
  */
 
-import { Repository, ReadRepository, QueryOptions, QueryResult } from '../common/repository.interface';
+import {
+  Repository,
+  ReadRepository,
+  QueryOptions,
+  QueryResult,
+} from '../common/repository.interface';
 import { Meeting } from '../entities/meeting.entity';
 import { DateRange } from '../common/value-objects';
 
@@ -26,8 +31,13 @@ export interface MeetingRepository extends Repository<Meeting> {
   findByOrganizer(organizerEmail: string): Promise<Meeting[]>;
   findByAttendee(attendeeEmail: string): Promise<Meeting[]>;
   findUpcomingMeetings(days?: number): Promise<Meeting[]>;
-  findConflictingMeetings(dateRange: DateRange, excludeMeetingId?: string): Promise<Meeting[]>;
-  findByStatus(status: 'scheduled' | 'in-progress' | 'completed' | 'cancelled'): Promise<Meeting[]>;
+  findConflictingMeetings(
+    dateRange: DateRange,
+    excludeMeetingId?: string,
+  ): Promise<Meeting[]>;
+  findByStatus(
+    status: 'scheduled' | 'in-progress' | 'completed' | 'cancelled',
+  ): Promise<Meeting[]>;
   findRecurringMeetings(): Promise<Meeting[]>;
   findMany(options?: MeetingQueryOptions): Promise<QueryResult<Meeting>>;
   getMeetingAnalytics(): Promise<{
@@ -46,6 +56,9 @@ export interface MeetingReadRepository extends ReadRepository<Meeting> {
   findByOrganizer(organizerEmail: string): Promise<Meeting[]>;
   findByAttendee(attendeeEmail: string): Promise<Meeting[]>;
   findUpcomingMeetings(days?: number): Promise<Meeting[]>;
-  findConflictingMeetings(dateRange: DateRange, excludeMeetingId?: string): Promise<Meeting[]>;
+  findConflictingMeetings(
+    dateRange: DateRange,
+    excludeMeetingId?: string,
+  ): Promise<Meeting[]>;
   searchMeetings(query: string): Promise<Meeting[]>;
 }

@@ -12,10 +12,16 @@ import type { TaskRepository } from '../../../domain/repositories/task.repositor
 import { Priority, TaskStatus } from '../../../domain/common/value-objects';
 
 @Injectable()
-export class GetTasksHandler implements QueryHandler<GetTasksQuery, Result<TaskListResponseDto, string>> {
-  constructor(@Inject('TaskRepository') private readonly taskRepository: TaskRepository) {}
+export class GetTasksHandler
+  implements QueryHandler<GetTasksQuery, Result<TaskListResponseDto, string>>
+{
+  constructor(
+    @Inject('TaskRepository') private readonly taskRepository: TaskRepository,
+  ) {}
 
-  async handle(query: GetTasksQuery): Promise<Result<TaskListResponseDto, string>> {
+  async handle(
+    query: GetTasksQuery,
+  ): Promise<Result<TaskListResponseDto, string>> {
     try {
       const options = query.options || {};
       const limit = options.limit || 20;
@@ -26,7 +32,7 @@ export class GetTasksHandler implements QueryHandler<GetTasksQuery, Result<TaskL
         limit,
         offset,
         sortBy: options.sortBy || 'urgencyScore',
-        sortOrder: options.sortOrder || 'desc' as const,
+        sortOrder: options.sortOrder || ('desc' as const),
         filters: this.buildFilters(options.filters),
       };
 
@@ -34,7 +40,7 @@ export class GetTasksHandler implements QueryHandler<GetTasksQuery, Result<TaskL
       const result = await this.taskRepository.findMany(queryOptions);
 
       // Map to DTOs
-      const items = result.items.map(task => this.mapToResponseDto(task));
+      const items = result.items.map((task) => this.mapToResponseDto(task));
 
       // Calculate pagination
       const totalPages = Math.ceil(result.total / limit);
@@ -100,7 +106,7 @@ export class GetTasksHandler implements QueryHandler<GetTasksQuery, Result<TaskL
 
   private mapToResponseDto(task: any): TaskResponseDto {
     const taskJson = task.toJSON();
-    
+
     return {
       id: taskJson.id,
       title: taskJson.title,

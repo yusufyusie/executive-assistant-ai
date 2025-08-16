@@ -3,7 +3,13 @@
  * Production-ready security for API endpoints
  */
 
-import { Injectable, CanActivate, ExecutionContext, UnauthorizedException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  UnauthorizedException,
+  Logger,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
 
@@ -15,14 +21,20 @@ export class ApiKeyGuard implements CanActivate {
   constructor(private readonly configService: ConfigService) {
     // In production, these would come from a secure key management system
     const apiKey = this.configService.get<string>('security.apiKey');
-    const additionalKeys = this.configService.get<string>('ADDITIONAL_API_KEYS', '');
-    
-    this.validApiKeys = new Set([
-      apiKey,
-      ...additionalKeys.split(',').filter(key => key.trim()),
-    ].filter((key): key is string => Boolean(key)));
+    const additionalKeys = this.configService.get<string>(
+      'ADDITIONAL_API_KEYS',
+      '',
+    );
 
-    this.logger.log(`Initialized with ${this.validApiKeys.size} valid API keys`);
+    this.validApiKeys = new Set(
+      [apiKey, ...additionalKeys.split(',').filter((key) => key.trim())].filter(
+        (key): key is string => Boolean(key),
+      ),
+    );
+
+    this.logger.log(
+      `Initialized with ${this.validApiKeys.size} valid API keys`,
+    );
   }
 
   canActivate(context: ExecutionContext): boolean {
@@ -35,7 +47,9 @@ export class ApiKeyGuard implements CanActivate {
     }
 
     if (!this.isValidApiKey(apiKey)) {
-      this.logger.warn(`Invalid API key attempted for ${request.method} ${request.url}`);
+      this.logger.warn(
+        `Invalid API key attempted for ${request.method} ${request.url}`,
+      );
       throw new UnauthorizedException('Invalid API key');
     }
 
@@ -61,7 +75,10 @@ export class ApiKeyGuard implements CanActivate {
 
     // Check query parameter (less secure, for development only)
     const queryKey = request.query.api_key as string;
-    if (queryKey && this.configService.get('app.environment') !== 'production') {
+    if (
+      queryKey &&
+      this.configService.get('app.environment') !== 'production'
+    ) {
       return queryKey;
     }
 
@@ -84,13 +101,22 @@ export class ApiKeyGuard implements CanActivate {
 @Injectable()
 export class RateLimitGuard implements CanActivate {
   private readonly logger = new Logger(RateLimitGuard.name);
-  private readonly requestCounts = new Map<string, { count: number; resetTime: number }>();
+  private readonly requestCounts = new Map<
+    string,
+    { count: number; resetTime: number }
+  >();
   private readonly maxRequests: number;
   private readonly windowMs: number;
 
   constructor(private readonly configService: ConfigService) {
-    this.maxRequests = this.configService.get<number>('performance.rateLimitMax', 100);
-    this.windowMs = this.configService.get<number>('performance.rateLimitTtl', 60000);
+    this.maxRequests = this.configService.get<number>(
+      'performance.rateLimitMax',
+      100,
+    );
+    this.windowMs = this.configService.get<number>(
+      'performance.rateLimitTtl',
+      60000,
+    );
 
     // Clean up old entries every 5 minutes
     setInterval(() => this.cleanup(), 5 * 60 * 1000);
@@ -102,7 +128,7 @@ export class RateLimitGuard implements CanActivate {
     const now = Date.now();
 
     const record = this.requestCounts.get(identifier);
-    
+
     if (!record || now > record.resetTime) {
       // New window or expired window
       this.requestCounts.set(identifier, {
@@ -132,7 +158,7 @@ export class RateLimitGuard implements CanActivate {
     const forwarded = request.headers['x-forwarded-for'] as string;
     const realIp = request.headers['x-real-ip'] as string;
     const ip = forwarded?.split(',')[0] || realIp || request.ip || 'unknown';
-    
+
     return `ip_${ip}`;
   }
 
@@ -146,10 +172,12 @@ export class RateLimitGuard implements CanActivate {
       }
     }
 
-    toDelete.forEach(key => this.requestCounts.delete(key));
-    
+    toDelete.forEach((key) => this.requestCounts.delete(key));
+
     if (toDelete.length > 0) {
-      this.logger.debug(`Cleaned up ${toDelete.length} expired rate limit records`);
+      this.logger.debug(
+        `Cleaned up ${toDelete.length} expired rate limit records`,
+      );
     }
   }
 }
@@ -169,13 +197,16 @@ export class RequestValidationGuard implements CanActivate {
       const contentType = request.headers['content-type'];
       if (contentType && !contentType.includes('application/json')) {
         this.logger.warn(`Invalid content type: ${contentType}`);
-        throw new UnauthorizedException('Content-Type must be application/json');
+        throw new UnauthorizedException(
+          'Content-Type must be application/json',
+        );
       }
     }
 
     // Validate request size (basic protection against large payloads)
     const contentLength = request.headers['content-length'];
-    if (contentLength && parseInt(contentLength) > 10 * 1024 * 1024) { // 10MB limit
+    if (contentLength && parseInt(contentLength) > 10 * 1024 * 1024) {
+      // 10MB limit
       this.logger.warn(`Request too large: ${contentLength} bytes`);
       throw new UnauthorizedException('Request payload too large');
     }

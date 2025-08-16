@@ -25,7 +25,9 @@ export class TaskService {
   private readonly logger = new Logger(TaskService.name);
 
   constructor(private readonly taskApplicationService: TaskApplicationService) {
-    this.logger.warn('TaskService is deprecated. Use TaskApplicationService directly.');
+    this.logger.warn(
+      'TaskService is deprecated. Use TaskApplicationService directly.',
+    );
   }
 
   // Legacy methods for backward compatibility
@@ -49,12 +51,17 @@ export class TaskService {
   }
 
   async smartPrioritize(tasks?: any[]): Promise<any> {
-    const result = await this.taskApplicationService.prioritizeTasks({ taskIds: tasks });
-    return result.isSuccess ? result.value : { prioritizedTasks: [], recommendations: [] };
+    const result = await this.taskApplicationService.prioritizeTasks({
+      taskIds: tasks,
+    });
+    return result.isSuccess
+      ? result.value
+      : { prioritizedTasks: [], recommendations: [] };
   }
 
   async getTasksByPriority(priority: string): Promise<any[]> {
-    const result = await this.taskApplicationService.getTasksByPriority(priority);
+    const result =
+      await this.taskApplicationService.getTasksByPriority(priority);
     return result.isSuccess ? result.value : [];
   }
 
@@ -70,6 +77,4 @@ export class TaskService {
       timestamp: new Date().toISOString(),
     };
   }
-
-
 }

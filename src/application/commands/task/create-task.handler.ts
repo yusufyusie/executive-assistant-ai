@@ -13,10 +13,16 @@ import type { TaskRepository } from '../../../domain/repositories/task.repositor
 // Value objects are created internally by Task.create
 
 @Injectable()
-export class CreateTaskHandler implements CommandHandler<CreateTaskCommand, Result<TaskResponseDto, string>> {
-  constructor(@Inject('TaskRepository') private readonly taskRepository: TaskRepository) {}
+export class CreateTaskHandler
+  implements CommandHandler<CreateTaskCommand, Result<TaskResponseDto, string>>
+{
+  constructor(
+    @Inject('TaskRepository') private readonly taskRepository: TaskRepository,
+  ) {}
 
-  async handle(command: CreateTaskCommand): Promise<Result<TaskResponseDto, string>> {
+  async handle(
+    command: CreateTaskCommand,
+  ): Promise<Result<TaskResponseDto, string>> {
     try {
       const { data } = command;
 
@@ -62,7 +68,7 @@ export class CreateTaskHandler implements CommandHandler<CreateTaskCommand, Resu
 
   private mapToResponseDto(task: Task): TaskResponseDto {
     const taskJson = task.toJSON();
-    
+
     return {
       id: taskJson.id,
       title: taskJson.title,

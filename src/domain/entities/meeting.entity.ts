@@ -5,10 +5,10 @@
 
 import { AggregateRoot } from '../common/aggregate-root';
 import { Email, DateRange } from '../common/value-objects';
-import { 
-  MeetingScheduledEvent, 
-  MeetingCancelledEvent, 
-  MeetingReminderSentEvent 
+import {
+  MeetingScheduledEvent,
+  MeetingCancelledEvent,
+  MeetingReminderSentEvent,
 } from '../common/domain-events';
 
 export interface Attendee {
@@ -50,7 +50,7 @@ export class Meeting extends AggregateRoot {
   constructor(id: string, props: MeetingProps, createdAt?: Date) {
     super(id, createdAt);
     this.validateMeetingProps(props);
-    
+
     this._title = props.title;
     this._description = props.description;
     this._dateRange = props.dateRange;
@@ -122,7 +122,9 @@ export class Meeting extends AggregateRoot {
   }
 
   get isUpcoming(): boolean {
-    return this._status === 'scheduled' && this._dateRange.startDate > new Date();
+    return (
+      this._status === 'scheduled' && this._dateRange.startDate > new Date()
+    );
   }
 
   get isInProgress(): boolean {
@@ -149,8 +151,8 @@ export class Meeting extends AggregateRoot {
     }
 
     // Validate that organizer is in attendees list
-    const organizerInAttendees = props.attendees.some(
-      attendee => attendee.email.equals(props.organizer)
+    const organizerInAttendees = props.attendees.some((attendee) =>
+      attendee.email.equals(props.organizer),
     );
     if (!organizerInAttendees) {
       throw new Error('Organizer must be included in attendees list');
@@ -181,8 +183,8 @@ export class Meeting extends AggregateRoot {
   }
 
   public addAttendee(attendee: Attendee): void {
-    const existingAttendee = this._attendees.find(
-      a => a.email.equals(attendee.email)
+    const existingAttendee = this._attendees.find((a) =>
+      a.email.equals(attendee.email),
     );
 
     if (existingAttendee) {
@@ -198,15 +200,18 @@ export class Meeting extends AggregateRoot {
       throw new Error('Cannot remove the meeting organizer');
     }
 
-    const index = this._attendees.findIndex(a => a.email.equals(email));
+    const index = this._attendees.findIndex((a) => a.email.equals(email));
     if (index !== -1) {
       this._attendees.splice(index, 1);
       this.markAsUpdated();
     }
   }
 
-  public updateAttendeeResponse(email: Email, responseStatus: Attendee['responseStatus']): void {
-    const attendee = this._attendees.find(a => a.email.equals(email));
+  public updateAttendeeResponse(
+    email: Email,
+    responseStatus: Attendee['responseStatus'],
+  ): void {
+    const attendee = this._attendees.find((a) => a.email.equals(email));
     if (!attendee) {
       throw new Error(`Attendee ${email.value} not found`);
     }
@@ -264,7 +269,9 @@ export class Meeting extends AggregateRoot {
     this._remindersSent.push({ type: reminderType, sentAt });
     this.markAsUpdated();
 
-    this.addDomainEvent(new MeetingReminderSentEvent(this.id, reminderType, sentAt));
+    this.addDomainEvent(
+      new MeetingReminderSentEvent(this.id, reminderType, sentAt),
+    );
   }
 
   public toJSON(): Record<string, any> {
@@ -275,7 +282,7 @@ export class Meeting extends AggregateRoot {
       dateRange: this._dateRange.toJSON(),
       location: this._location,
       organizer: this._organizer.toJSON(),
-      attendees: this._attendees.map(a => ({
+      attendees: this._attendees.map((a) => ({
         email: a.email.toJSON(),
         name: a.name,
         isRequired: a.isRequired,
@@ -287,7 +294,7 @@ export class Meeting extends AggregateRoot {
       isRecurring: this._isRecurring,
       recurrencePattern: this._recurrencePattern,
       status: this._status,
-      remindersSent: this._remindersSent.map(r => ({
+      remindersSent: this._remindersSent.map((r) => ({
         type: r.type,
         sentAt: r.sentAt.toISOString(),
       })),
@@ -297,16 +304,18 @@ export class Meeting extends AggregateRoot {
   }
 
   // Factory method
-  public static create(props: Omit<MeetingProps, 'organizer' | 'attendees'> & {
-    organizer: string;
-    attendees: Array<Omit<Attendee, 'email'> & { email: string }>;
-  }): Meeting {
+  public static create(
+    props: Omit<MeetingProps, 'organizer' | 'attendees'> & {
+      organizer: string;
+      attendees: Array<Omit<Attendee, 'email'> & { email: string }>;
+    },
+  ): Meeting {
     const id = `meeting_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
+
     const meetingProps: MeetingProps = {
       ...props,
       organizer: new Email(props.organizer),
-      attendees: props.attendees.map(a => ({
+      attendees: props.attendees.map((a) => ({
         ...a,
         email: new Email(a.email),
       })),
