@@ -21,6 +21,11 @@ import { AutomationModule } from './modules/automation/automation.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
+// Enterprise Configuration
+import { ServiceFactory } from './common/factories/service.factory';
+import { DynamicConfigurationManager } from './common/configuration/dynamic-config.manager';
+import { ConfigurableModuleFactory } from './common/factories/module.factory';
+
 @Module({
   imports: [
     // Global Configuration
@@ -43,7 +48,11 @@ import { AppService } from './app.service';
   ],
 
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    ServiceFactory,
+    DynamicConfigurationManager,
+  ],
 })
 export class AppModule implements OnModuleInit {
   private readonly logger = new Logger(AppModule.name);
