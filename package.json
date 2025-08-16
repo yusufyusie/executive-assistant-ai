@@ -1,8 +1,8 @@
 {
-  "name": "executive-assistant-ai",
+  "name": "executive-assistant-platform",
   "version": "2.0.0",
-  "description": "AI-powered Executive Assistant automation platform with comprehensive API integrations for tech startup executives",
-  "author": "Executive Assistant AI Team",
+  "description": "Executive Assistant automation platform with comprehensive API integrations for tech startup executives",
+  "author": "Executive Assistant Team",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {

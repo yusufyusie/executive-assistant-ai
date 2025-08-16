@@ -5,7 +5,7 @@
 
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
-import { AIAssistantService } from '../../../application/services/ai-assistant.service';
+import { ExecutiveAssistantService } from '../../../application/services/executive-assistant.service';
 import { TaskApplicationService } from '../../../application/services/task-application.service';
 import { GoogleCalendarService } from '../../../infrastructure/external-services/google-calendar/google-calendar.service';
 import { SendGridService } from '../../../infrastructure/external-services/sendgrid/sendgrid.service';
@@ -27,7 +27,7 @@ export class AutomationService {
   private automationRuns: AutomationRun[] = [];
 
   constructor(
-    private readonly aiAssistant: AIAssistantService,
+    private readonly assistantService: ExecutiveAssistantService,
     private readonly taskService: TaskApplicationService,
     private readonly calendarService: GoogleCalendarService,
     private readonly emailService: SendGridService,

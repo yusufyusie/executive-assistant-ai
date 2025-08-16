@@ -7,7 +7,7 @@ import { Module } from '@nestjs/common';
 import { AssistantController } from './controllers/assistant.controller';
 
 // Application Services
-import { AIAssistantService } from '../../application/services/ai-assistant.service';
+import { ExecutiveAssistantService } from '../../application/services/executive-assistant.service';
 
 // Infrastructure Services
 import { GeminiService } from '../../infrastructure/external-services/gemini/gemini.service';
@@ -21,13 +21,13 @@ import { TaskModule } from '../task/task.module';
   imports: [TaskModule],
   controllers: [AssistantController],
   providers: [
-    AIAssistantService,
+    ExecutiveAssistantService,
     GeminiService,
     GoogleCalendarService,
     SendGridService,
   ],
   exports: [
-    AIAssistantService,
+    ExecutiveAssistantService,
     GeminiService,
     GoogleCalendarService,
     SendGridService,

@@ -1,6 +1,6 @@
 /**
- * AI Assistant Service - Application Layer
- * Orchestrates AI-powered executive assistant functionality
+ * Executive Assistant Service - Application Layer
+ * Orchestrates executive assistant functionality with natural language processing
  */
 
 import { Injectable, Logger } from '@nestjs/common';
@@ -48,8 +48,8 @@ export interface AssistantAction {
 }
 
 @Injectable()
-export class AIAssistantService {
-  private readonly logger = new Logger(AIAssistantService.name);
+export class ExecutiveAssistantService {
+  private readonly logger = new Logger(ExecutiveAssistantService.name);
 
   constructor(
     private readonly geminiService: GeminiService,

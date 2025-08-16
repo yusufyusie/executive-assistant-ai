@@ -116,3 +116,50 @@ ssl/
 # Documentation build
 docs/build/
 docs/.vuepress/dist/
+
+# AI Tool Traces (NEVER COMMIT)
+.augment/
+.qodo/
+.copilot/
+.cursor/
+.codeium/
+.tabnine/
+.github-copilot/
+*-ai-generated*
+*-copilot-*
+*-augment-*
+*-qodo-*
+*.ai-trace
+*.copilot-trace
+ai-session-*
+copilot-session-*
+augment-session-*
+qodo-session-*
+
+# AI Configuration Files
+.copilotrc
+.augmentrc
+.qodorc
+.cursorrc
+.codeiumrc
+.tabninerc
+copilot.json
+augment.json
+qodo.json
+
+# AI Chat/Session Files
+chat-history/
+ai-conversations/
+copilot-chats/
+augment-chats/
+*.ai-chat
+*.copilot-chat
+*.augment-chat
+
+# AI Generated Documentation
+*-AI-GENERATED*
+*-COPILOT-GENERATED*
+*-AUGMENT-GENERATED*
+STRATEGIC-*
+PROJECT-CLEANUP-*
+AI-TOOL-*

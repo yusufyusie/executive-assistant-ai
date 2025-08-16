@@ -13,11 +13,11 @@ GET  /test-apis            - Test all API connections
 GET  /api/docs             - Swagger documentation
 ```
 
-### **🤖 AI Assistant Endpoints**
+### **🤖 Executive Assistant Endpoints**
 ```
-POST /api/assistant/process      - Process AI requests
+POST /api/assistant/process      - Process natural language requests
 GET  /api/assistant/briefing     - Generate daily briefing
-GET  /api/assistant/capabilities - Get AI capabilities
+GET  /api/assistant/capabilities - Get assistant capabilities
 GET  /api/assistant/health       - Assistant service health
 ```
 
@@ -26,7 +26,7 @@ GET  /api/assistant/health       - Assistant service health
 GET  /api/calendar/events              - Get calendar events
 POST /api/calendar/schedule            - Schedule new event
 GET  /api/calendar/availability        - Check availability
-POST /api/calendar/intelligent-schedule - AI-powered scheduling
+POST /api/calendar/intelligent-schedule - Smart scheduling
 GET  /api/calendar/health              - Calendar service health
 ```
 

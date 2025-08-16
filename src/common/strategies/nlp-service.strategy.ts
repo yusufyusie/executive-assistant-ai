@@ -57,9 +57,9 @@ export interface AIResponse {
 }
 
 /**
- * AI service capabilities
+ * Natural Language Processing service capabilities
  */
-export interface AICapabilities {
+export interface NLPCapabilities {
   textGeneration: boolean;
   codeGeneration: boolean;
   summarization: boolean;
@@ -76,7 +76,7 @@ export interface AICapabilities {
  * Abstract AI service strategy
  */
 export abstract class AIServiceStrategy extends BaseConfigurableService<AIServiceConfiguration> {
-  protected abstract capabilities: AICapabilities;
+  protected abstract capabilities: NLPCapabilities;
 
   constructor(
     configService: ConfigService,
@@ -109,7 +109,7 @@ export abstract class AIServiceStrategy extends BaseConfigurableService<AIServic
   /**
    * Get service capabilities
    */
-  getCapabilities(): AICapabilities {
+  getCapabilities(): NLPCapabilities {
     return this.capabilities;
   }
 
@@ -194,7 +194,7 @@ export abstract class AIServiceStrategy extends BaseConfigurableService<AIServic
  * Gemini AI service implementation
  */
 export class GeminiAIStrategy extends AIServiceStrategy {
-  protected capabilities: AICapabilities = {
+  protected capabilities: NLPCapabilities = {
     textGeneration: true,
     codeGeneration: true,
     summarization: true,

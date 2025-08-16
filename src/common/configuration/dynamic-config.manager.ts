@@ -387,12 +387,12 @@ export class DynamicConfigurationManager implements OnModuleInit, OnModuleDestro
       'app.port': { type: 'number', required: true, defaultValue: 3000 },
     });
 
-    // AI Services schema
-    this.registerSchema('ai', {
-      'ai.gemini.apiKey': { type: 'string', required: true, sensitive: true },
-      'ai.gemini.model': { type: 'string', defaultValue: 'gemini-2.0-flash-exp' },
-      'ai.gemini.temperature': { type: 'number', defaultValue: 0.7 },
-      'ai.gemini.maxTokens': { type: 'number', defaultValue: 1000 },
+    // Natural Language Processing Services schema
+    this.registerSchema('nlp', {
+      'nlp.gemini.apiKey': { type: 'string', required: true, sensitive: true },
+      'nlp.gemini.model': { type: 'string', defaultValue: 'gemini-2.0-flash-exp' },
+      'nlp.gemini.temperature': { type: 'number', defaultValue: 0.7 },
+      'nlp.gemini.maxTokens': { type: 'number', defaultValue: 1000 },
     });
 
     this.logger.debug('Default configuration schemas registered');
