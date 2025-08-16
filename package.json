@@ -21,7 +21,9 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "clean": "rimraf dist coverage .nyc_output",
-    "precommit": "lint-staged"
+    "precommit": "lint-staged",
+    "config:validate": "ts-node scripts/validate-config.ts",
+    "config:check": "npm run config:validate"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
