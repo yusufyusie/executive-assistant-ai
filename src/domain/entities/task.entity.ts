@@ -316,14 +316,52 @@ export class Task extends AggregateRoot {
     }
   }
 
+  // Test compatibility methods
+  public markAsCompleted(): void {
+    this._status = new TaskStatus('completed');
+    this._completedAt = new Date();
+    this.markAsUpdated();
+    this.addDomainEvent(new TaskCompletedEvent(this.id, this._completedAt));
+  }
+
+  public updatePriority(priority: string): void {
+    this.changePriority(new Priority(priority));
+  }
+
+  public calculateUrgencyScore(): number {
+    return this.urgencyScore;
+  }
+
+  public canBeStarted(completedDependencies: Set<string>): boolean {
+    if (this._dependencies.length === 0) {
+      return true;
+    }
+    return this._dependencies.every(dep => completedDependencies.has(dep));
+  }
+
+  public getUncommittedEvents(): any[] {
+    return this.domainEvents.map(event => ({
+      ...event,
+      eventType: event.constructor.name.replace('Event', '')
+    }));
+  }
+
+  public markUncommittedEvents(): void {
+    this.clearDomainEvents();
+  }
+
+  get isCompleted(): boolean {
+    return this._status.isCompleted;
+  }
+
   public toJSON(): Record<string, any> {
     return {
       ...super.toJSON(),
       title: this._title,
       description: this._description,
-      status: this._status.toJSON(),
-      priority: this._priority.toJSON(),
-      assignee: this._assignee?.toJSON(),
+      status: this._status.value,
+      priority: this._priority.value,
+      assignee: this._assignee?.value,
       dueDate: this._dueDate?.toISOString(),
       tags: [...this._tags],
       estimatedDuration: this._estimatedDuration,
@@ -342,7 +380,7 @@ export class Task extends AggregateRoot {
       assignee?: string;
     },
   ): Task {
-    const id = `task_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const id = `task_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
 
     const taskProps: TaskProps = {
       ...props,
@@ -352,5 +390,30 @@ export class Task extends AggregateRoot {
     };
 
     return new Task(id, taskProps);
+  }
+
+  // Factory method for creating tasks from JSON
+  public static fromJSON(json: any): Task {
+    const taskProps: TaskProps = {
+      title: json.title,
+      description: json.description,
+      status: new TaskStatus(json.status),
+      priority: new Priority(json.priority),
+      assignee: json.assignee ? new Email(json.assignee) : undefined,
+      dueDate: json.dueDate ? new Date(json.dueDate) : undefined,
+      tags: json.tags || [],
+      estimatedDuration: json.estimatedDuration,
+      dependencies: json.dependencies || [],
+    };
+
+    const task = new Task(json.id, taskProps, json.createdAt ? new Date(json.createdAt) : undefined);
+    if (json.updatedAt) {
+      task._updatedAt = new Date(json.updatedAt);
+    }
+    if (json.completedAt) {
+      task._completedAt = new Date(json.completedAt);
+    }
+
+    return task;
   }
 }

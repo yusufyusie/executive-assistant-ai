@@ -39,4 +39,8 @@ export class AppController {
   testApis(): any {
     return this.appService.testApis();
   }
+
+  getApiInfo(): any {
+    return this.appService.getApiInfo();
+  }
 }

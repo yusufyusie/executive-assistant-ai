@@ -24,7 +24,6 @@ import { AppService } from './app.service';
 // Enterprise Configuration
 import { ServiceFactory } from './common/factories/service.factory';
 import { DynamicConfigurationManager } from './common/configuration/dynamic-config.manager';
-import { ConfigurableModuleFactory } from './common/factories/module.factory';
 
 @Module({
   imports: [
