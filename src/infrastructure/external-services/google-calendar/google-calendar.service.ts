@@ -376,13 +376,15 @@ export class GoogleCalendarService {
   }
 
   private getMockCreatedEvent(event: CalendarEvent): CalendarEvent {
+    const attendees = (event.attendees || []).map((attendee: any) => ({
+      email: typeof attendee === 'string' ? attendee : attendee.email,
+      responseStatus: 'needsAction' as const,
+    }));
+
     return {
       ...event,
       id: `mock_event_${Date.now()}`,
-      attendees: event.attendees?.map((attendee) => ({
-        ...attendee,
-        responseStatus: 'needsAction' as const,
-      })),
+      attendees,
     };
   }
 
